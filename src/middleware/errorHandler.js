@@ -4,6 +4,7 @@ const errorHandler = (err, req, res, next) => {
   console.log('stack -->', err.stack);
   console.log('\n message -->', err.message);
 
+  console.log('status -->', err.statusCode);
   const statusCode = err.statusCode;
   const status = err.status;
   const message = err.message;

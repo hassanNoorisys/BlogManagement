@@ -4,6 +4,7 @@ import constants from '../config/constants.js';
 import {
   loginUsersService,
   registerUserService,
+  requestAuthorService,
   verifyEmailService,
 } from '../services/user.service.js';
 import responseHandler from '../utils/responseHandler.js';
@@ -69,4 +70,21 @@ const loginUser = asyncHandler(async (req, res, next) => {
   });
 });
 
-export { registerUser, verifyEmail, loginUser };
+// request author role
+const requestAuthorRole = asyncHandler(async (req, res, next) => {
+
+  const { email } = req.body
+
+  if (!email)
+    return next(
+      new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    );
+
+  await requestAuthorService({ email })
+
+  responseHandler(res, constants.OK, 'success', 'Request has been sent')
+
+})
+
+
+export { registerUser, verifyEmail, loginUser, requestAuthorRole };

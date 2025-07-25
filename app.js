@@ -11,8 +11,11 @@ app.use(morgan('dev'));
 
 // routes
 import userRoute from './src/routes/user.route.js';
+import adminRoute from './src/routes/admin.route.js'
 
 app.use('/api/user', userRoute);
+
+app.use('/api/admin', adminRoute);
 
 // error handler
 app.use(errorHandler);

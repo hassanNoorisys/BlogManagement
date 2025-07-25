@@ -2,8 +2,8 @@ import constants from '../config/constants.js';
 import userModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
 import bcrypt from 'bcryptjs';
-import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
+import sendEmail from '../utils/sendEmail.js';
 
 // register user service
 const registerUserService = async (data) => {
@@ -19,24 +19,10 @@ const registerUserService = async (data) => {
 
   // send otp by email
   const EMAIL_USER = process.env.EMAIL_USER;
-  const EMAIL_PASS = process.env.EMAIL_PASS;
-  const EMAIL_SERVICE = process.env.EMAIL_SERVICE;
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const transporter = nodemailer.createTransport({
-    service: EMAIL_SERVICE,
-    auth: {
-      user: EMAIL_USER,
-      pass: EMAIL_PASS,
-    },
-  });
 
-  await transporter.sendMail({
-    from: `Blog managment ${EMAIL_USER}`,
-    to: email,
-    subject: 'Email Verification',
-    text: `Your OTP for blog management is ${otp}`,
-  });
+  await sendEmail(EMAIL_USER, email, 'Email Verification', `Your OTP for blog management is ${otp}`)
 
   // save user
   const newUser = new userModel({ email, password, bio, otp });
@@ -72,11 +58,30 @@ const loginUsersService = async (data) => {
   if (!valid) throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
 
   const SECRET_KEY = process.env.SECRET_KEY;
-  const token = jwt.sign({ id: existingUser._id }, SECRET_KEY, {
+  const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, SECRET_KEY, {
     expiresIn: '10d',
   });
 
   return token;
 };
 
-export { registerUserService, verifyEmailService, loginUsersService };
+// request author service
+const requestAuthorService = async (data) => {
+
+  const { email } = data;
+
+  const existingUser = await userModel.findOne({ email })
+
+  if (!existingUser)
+    throw new AppError(constants.NOT_FOUND, 'User is not present');
+
+  if (existingUser.role === 'author') throw new AppError(constants.NO_CONTENT, 'You are already an author')
+
+  // send an email to admin to make the user an author
+  const EMAIL_USER = process.env.EMAIL_USER;
+
+  await sendEmail(EMAIL_USER, EMAIL_USER, 'Request permission to become an athor', `The user having email: ${email} has requested to be an author`)
+
+}
+
+export { registerUserService, verifyEmailService, loginUsersService, requestAuthorService };
