@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "npm index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "format": "prettier --write ."
   },
   "author": "MohammedHassan",
   "license": "ISC",

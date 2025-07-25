@@ -1,34 +1,31 @@
-import multer from "multer";
-import { fileURLToPath } from 'url'
-import AppError from "../utils/appError.js";
-import constants from "../config/constants.js";
-import path from "path";
-
+import multer from 'multer';
+import { fileURLToPath } from 'url';
+import AppError from '../utils/appError.js';
+import constants from '../config/constants.js';
+import path from 'path';
 
 const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    if (!file) throw new AppError(constants.BAD_REQUEST, 'Image is required');
 
-    destination: (req, file, cb) => {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
-        if (!file) throw new AppError(constants.BAD_REQUEST, 'Image is required')
+    const profileDest = path.join(__dirname, '../public/profileImages/');
 
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
+    cb(null, profileDest);
+  },
 
-        const profileDest = path.join(__dirname, '../public/profileImages/');
+  filename: (req, file, cb) => {
+    const fileName = file.originalname.split('.')[0];
 
-        cb(null, profileDest)
-    },
+    const profileImageName =
+      Date.now() + ' ' + fileName + path.extname(file.originalname);
 
-    filename: (req, file, cb) => {
+    cb(null, profileImageName);
+  },
+});
 
-        const fileName = file.originalname.split('.')[0];
+const profileImageUpload = multer({ storage });
 
-        const profileImageName = Date.now() + ' ' + fileName + path.extname(file.originalname);
-
-        cb(null, profileImageName)
-    }
-})
-
-const profileImageUpload = multer({ storage })
-
-export default profileImageUpload
+export default profileImageUpload;
