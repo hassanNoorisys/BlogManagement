@@ -4,7 +4,11 @@ const blogSchema = new Schema(
   {
     author: {
       type: Schema.Types.ObjectId,
-      required: true,
+      ref: 'user',
+    },
+
+    admin: {
+      type: Schema.Types.ObjectId,
       ref: 'user',
     },
 
@@ -24,10 +28,12 @@ const blogSchema = new Schema(
       unique: true,
     },
 
-    images: {
-      type: [{ url: String, alt: String }],
-      required: true,
-    },
+    images: [
+      {
+        type: { url: String, alt: String },
+        required: true,
+      }
+    ],
 
     favouriteCount: Number,
 
@@ -35,7 +41,7 @@ const blogSchema = new Schema(
 
     dislikeCount: Number,
   },
-  { timestamps }
+  { timestamps: true }
 );
 
 export default model('blog', blogSchema);
