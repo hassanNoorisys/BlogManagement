@@ -37,6 +37,9 @@ const getBlogService = async (data) => {
         fromYear,
         fromMonth,
         fromDay,
+
+        page,
+        size
     } = data;
 
     const fy =
@@ -64,14 +67,15 @@ const getBlogService = async (data) => {
         ...(title && { title }),
         ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
             ? {
-                  createdAt: {
-                      $gte: from,
-                      $lt: to,
-                  },
-              }
+                createdAt: {
+                    $gte: from,
+                    $lt: to,
+                },
+            }
             : {}),
     };
 
+    const isUniqueQuery = id || slug
     const blogs = await blogModel.aggregate([
         {
             $match: filter,
@@ -96,6 +100,7 @@ const getBlogService = async (data) => {
             $addFields: {
                 user: {
                     $cond: [
+
                         { $gt: [{ $size: '$author' }, 0] },
                         { $arrayElemAt: ['$author', 0] },
                         { $arrayElemAt: ['$admin', 0] },
@@ -105,15 +110,15 @@ const getBlogService = async (data) => {
         },
         ...(blogOwnerName
             ? [
-                  {
-                      $match: {
-                          'user.bio.name': {
-                              $regex: blogOwnerName,
-                              $options: 'i',
-                          },
-                      },
-                  },
-              ]
+                {
+                    $match: {
+                        'user.bio.name': {
+                            $regex: blogOwnerName,
+                            $options: 'i',
+                        },
+                    },
+                },
+            ]
             : []),
         {
             $project: {
@@ -125,12 +130,13 @@ const getBlogService = async (data) => {
                 'user.bio': 1,
             },
         },
-    ]);
+        { $skip: !isUniqueQuery ? ((page - 1) * size || 0) : 0 },
+        { $limit: Number(!isUniqueQuery ? size || 5 : 1) }
+    ])
 
     if (!blogs || blogs.length < 1)
         throw new AppError(constants.NO_CONTENT, 'Blog not found');
 
-    // console.log('get blogs service -->  ', blogs)
     return blogs;
 };
 
