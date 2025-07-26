@@ -120,7 +120,7 @@ const getBlogService = async (data) => {
   ]);
 
   if (!blogs || blogs.length < 1)
-    throw new AppError(constants.NO_CONTENT, 'No blogs found');
+    throw new AppError(constants.NO_CONTENT, 'Blog not found');
 
   // console.log('get blogs service -->  ', blogs)
   return blogs;
