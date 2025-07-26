@@ -1,10 +1,10 @@
 const responseHandler = (res, statusCode, status, message, data = null) => {
-  let response = { status };
+    let response = { status };
 
-  if (data) response.data = data;
-  if (message) response.message = message;
+    if (data) response.data = data;
+    if (message) response.message = message;
 
-  res.status(statusCode).json(response);
+    res.status(statusCode).json(response);
 };
 
 export default responseHandler;

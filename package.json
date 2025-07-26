@@ -1,28 +1,28 @@
 {
-  "name": "blogmanagement",
-  "version": "1.0.0",
-  "description": "A blog management API with admin, author, reader roles",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "start": "npm index.js",
-    "dev": "nodemon index.js",
-    "format": "prettier --write ."
-  },
-  "author": "MohammedHassan",
-  "license": "ISC",
-  "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.4",
-    "morgan": "^1.10.1",
-    "multer": "^2.0.2",
-    "nodemailer": "^7.0.5"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.10",
-    "prettier": "^3.6.2"
-  }
+    "name": "blogmanagement",
+    "version": "1.0.0",
+    "description": "A blog management API with admin, author, reader roles",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "npm index.js",
+        "dev": "nodemon index.js",
+        "format": "prettier --write ."
+    },
+    "author": "MohammedHassan",
+    "license": "ISC",
+    "dependencies": {
+        "bcryptjs": "^3.0.2",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^8.16.4",
+        "morgan": "^1.10.1",
+        "multer": "^2.0.2",
+        "nodemailer": "^7.0.5"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.10",
+        "prettier": "^3.6.2"
+    }
 }

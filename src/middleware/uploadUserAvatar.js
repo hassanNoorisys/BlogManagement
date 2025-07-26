@@ -5,25 +5,26 @@ import constants from '../config/constants.js';
 import path from 'path';
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (!file) throw new AppError(constants.BAD_REQUEST, 'Image is required');
+    destination: (req, file, cb) => {
+        if (!file)
+            throw new AppError(constants.BAD_REQUEST, 'Image is required');
 
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
 
-    const profileDest = path.join(__dirname, '../public/profileImages/');
+        const profileDest = path.join(__dirname, '../public/profileImages/');
 
-    cb(null, profileDest);
-  },
+        cb(null, profileDest);
+    },
 
-  filename: (req, file, cb) => {
-    const fileName = file.originalname.split('.')[0];
+    filename: (req, file, cb) => {
+        const fileName = file.originalname.split('.')[0];
 
-    const profileImageName =
-      Date.now() + ' ' + fileName + path.extname(file.originalname);
+        const profileImageName =
+            Date.now() + ' ' + fileName + path.extname(file.originalname);
 
-    cb(null, profileImageName);
-  },
+        cb(null, profileImageName);
+    },
 });
 
 const profileImageUpload = multer({ storage });

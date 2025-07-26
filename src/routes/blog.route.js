@@ -7,11 +7,11 @@ import { createBlog, getBlogs } from '../controllers/blog.controller.js';
 const route = Router();
 
 route.post(
-  '/create',
-  verifyToken,
-  verifyRole('admin', 'author'),
-  blogImageUpload.array('images'),
-  createBlog
+    '/create',
+    verifyToken,
+    verifyRole('admin', 'author'),
+    blogImageUpload.array('images'),
+    createBlog
 );
 
 route.get('/', getBlogs);
