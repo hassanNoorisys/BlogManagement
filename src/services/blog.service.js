@@ -59,8 +59,6 @@ const getBlogService = async (data) => {
     const from = new Date(fy, fm, fd);
     const to = new Date(ty, tm, td + 1);
 
-    // console.log(from, to, fromYear, toYear)
-
     const filter = {
         ...(slug && { slug }),
         ...(id && { _id: new Types.ObjectId(id) }),
@@ -140,4 +138,13 @@ const getBlogService = async (data) => {
     return blogs;
 };
 
-export { createBlogService, getBlogService };
+// update blog
+const updateBlogService = async (filter, data) => {
+
+    const update = await blogModel.findByIdAndUpdate({ _id: filter }, data, { new: true })
+        .select(['title'])
+
+    return update
+}
+
+export { createBlogService, getBlogService, updateBlogService };

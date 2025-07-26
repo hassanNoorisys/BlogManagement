@@ -1,4 +1,4 @@
-import { createBlogService, getBlogService } from '../services/blog.service.js';
+import { createBlogService, getBlogService, updateBlogService } from '../services/blog.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
@@ -27,11 +27,11 @@ const createBlog = asyncHandler(async (req, res, next) => {
     // create slug
     const slug =
         title
-            .toLocaleLowerCase()
+            .toLowerCase()
             .trim()
             .replace(/[^\w\s-]/g, '')
             .replace(/\s+/g, '-') +
-        ' ' +
+        '-' +
         Date.now();
 
     const newBlogTitle = await createBlogService({
@@ -64,4 +64,43 @@ const getBlogs = asyncHandler(async (req, res, next) => {
 
     responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
 });
-export { createBlog, getBlogs };
+
+// update blog
+const updateBlog = asyncHandler(async (req, res, next) => {
+
+    const blogId = new Types.ObjectId(req.params.id)
+
+    const { title, content } = req.body
+
+    if (!title && !content)
+        return next(
+            new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+        );
+
+    // handle images
+    if (req.files) {
+
+    }
+
+    let slug = '';
+    if (title) slug = title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') + '-' + Date.now();
+
+
+    console.log('update blog --> ', typeof slug)
+
+    const updatedBlogTitle = await updateBlogService(blogId, {
+
+        ...(title && { title }),
+        ...(content && { content }),
+        'slug': slug
+    })
+
+    console.log(Date.now())
+
+    responseHandler(res, constants.OK, 'success', 'Blog updated successfully', { title: updatedBlogTitle })
+})
+export {
+    createBlog,
+    getBlogs,
+    updateBlog
+};
