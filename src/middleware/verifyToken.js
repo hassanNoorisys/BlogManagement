@@ -1,28 +1,38 @@
-import constants from "../config/constants.js"
-import AppError from "../utils/appError.js"
-import jwt from 'jsonwebtoken'
-import responseHandler from "../utils/responseHandler.js"
+import constants from '../config/constants.js';
+import AppError from '../utils/appError.js';
+import jwt from 'jsonwebtoken';
+import responseHandler from '../utils/responseHandler.js';
 
 const verifyToken = (req, res, next) => {
+  let token = req.headers.authorization;
 
-    let token = req.headers.authorization
+  if (!token)
+    responseHandler(
+      res,
+      resconstants.UNAUTHORIZED,
+      'fail',
+      'Unauthorized access'
+    );
 
-    if (!token) responseHandler(res, resconstants.UNAUTHORIZED, 'fail', 'Unauthorized access')
+  token = token.split(' ')[1];
 
-    token = token.split(' ')[1]
+  const SECRET_KEY = process.env.SECRET_KEY;
+  const valid = jwt.verify(token, SECRET_KEY);
 
-    const SECRET_KEY = process.env.SECRET_KEY
-    const valid = jwt.verify(token, SECRET_KEY)
+  if (!valid)
+    responseHandler(
+      res,
+      resconstants.UNAUTHORIZED,
+      'fail',
+      'Unauthorized access'
+    );
 
-    if (!valid) responseHandler(res, resconstants.UNAUTHORIZED, 'fail', 'Unauthorized access')
+  const { role, id } = valid;
+  req.user = {};
+  req.user.role = role;
+  req.user.id = id;
 
+  next();
+};
 
-    const { role, id } = valid
-    req.user = {}
-    req.user.role = role
-    req.user.id = id
-
-    next()
-}
-
-export default verifyToken
+export default verifyToken;

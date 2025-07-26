@@ -22,7 +22,12 @@ const registerUserService = async (data) => {
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-  await sendEmail(EMAIL_USER, email, 'Email Verification', `Your OTP for blog management is ${otp}`)
+  await sendEmail(
+    EMAIL_USER,
+    email,
+    'Email Verification',
+    `Your OTP for blog management is ${otp}`
+  );
 
   // save user
   const newUser = new userModel({ email, password, bio, otp });
@@ -58,30 +63,43 @@ const loginUsersService = async (data) => {
   if (!valid) throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
 
   const SECRET_KEY = process.env.SECRET_KEY;
-  const token = jwt.sign({ id: existingUser._id, role: existingUser.role }, SECRET_KEY, {
-    expiresIn: '10d',
-  });
+  const token = jwt.sign(
+    { id: existingUser._id, role: existingUser.role },
+    SECRET_KEY,
+    {
+      expiresIn: '10d',
+    }
+  );
 
   return token;
 };
 
 // request author service
 const requestAuthorService = async (data) => {
-
   const { email } = data;
 
-  const existingUser = await userModel.findOne({ email })
+  const existingUser = await userModel.findOne({ email });
 
   if (!existingUser)
     throw new AppError(constants.NOT_FOUND, 'User is not present');
 
-  if (existingUser.role === 'author') throw new AppError(constants.NO_CONTENT, 'You are already an author')
+  if (existingUser.role === 'author')
+    throw new AppError(constants.NO_CONTENT, 'You are already an author');
 
   // send an email to admin to make the user an author
   const EMAIL_USER = process.env.EMAIL_USER;
 
-  await sendEmail(EMAIL_USER, EMAIL_USER, 'Request permission to become an athor', `The user having email: ${email} has requested to be an author`)
+  await sendEmail(
+    EMAIL_USER,
+    EMAIL_USER,
+    'Request permission to become an athor',
+    `The user having email: ${email} has requested to be an author`
+  );
+};
 
-}
-
-export { registerUserService, verifyEmailService, loginUsersService, requestAuthorService };
+export {
+  registerUserService,
+  verifyEmailService,
+  loginUsersService,
+  requestAuthorService,
+};

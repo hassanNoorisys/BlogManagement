@@ -72,19 +72,16 @@ const loginUser = asyncHandler(async (req, res, next) => {
 
 // request author role
 const requestAuthorRole = asyncHandler(async (req, res, next) => {
-
-  const { email } = req.body
+  const { email } = req.body;
 
   if (!email)
     return next(
       new AppError(constants.BAD_REQUEST, 'All fields are required !!')
     );
 
-  await requestAuthorService({ email })
+  await requestAuthorService({ email });
 
-  responseHandler(res, constants.OK, 'success', 'Request has been sent')
-
-})
-
+  responseHandler(res, constants.OK, 'success', 'Request has been sent');
+});
 
 export { registerUser, verifyEmail, loginUser, requestAuthorRole };

@@ -17,6 +17,6 @@ route
   .post('/login', loginUser);
 
 // request route
-route.post('/request-author-role', verifyToken, requestAuthorRole)
+route.post('/request-author-role', verifyToken, requestAuthorRole);
 
 export default route;

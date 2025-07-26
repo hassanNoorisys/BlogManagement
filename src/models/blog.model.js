@@ -32,7 +32,7 @@ const blogSchema = new Schema(
       {
         type: { url: String, alt: String },
         required: true,
-      }
+      },
     ],
 
     favouriteCount: Number,

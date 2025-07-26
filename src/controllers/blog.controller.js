@@ -1,40 +1,67 @@
-import { createBlogService } from "../services/blog.service.js";
-import asyncHandler from "../utils/asyncHandler.js";
-import { Types } from "mongoose";
-import responseHandler from "../utils/responseHandler.js";
-import constants from "../config/constants.js";
+import { createBlogService, getBlogService } from '../services/blog.service.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import { Types } from 'mongoose';
+import responseHandler from '../utils/responseHandler.js';
+import constants from '../config/constants.js';
 
+// create blog
 const createBlog = asyncHandler(async (req, res, next) => {
+  const userId = new Types.ObjectId(req.user.id);
+  const role = req.user.role;
 
-    const userId = new Types.ObjectId(req.user.id)
-    const role = req.user.role
+  // console.log('create blog constroller -->', userId, role)
 
-    // console.log('create blog constroller -->', userId, role)
+  const { title, content } = req.body;
 
-    const { title, content } = req.body
+  if (!title || !content)
+    return next(
+      new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    );
 
-    if (!title || !content)
-        return next(
-            new AppError(constants.BAD_REQUEST, 'All fields are required !!')
-        );
+  // handle image names
+  let images = [];
+  for (let file of req.files) {
+    images.push({ url: file.filename, alt: title });
+  }
 
-    // handle image names
-    let images = []
-    for (let file of req.files) {
+  // create slug
+  const slug =
+    title
+      .toLocaleLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-') +
+    ' ' +
+    Date.now();
 
-        images.push({ url: file.filename, alt: title })
-    }
+  const newBlogTitle = await createBlogService({
+    title,
+    content,
+    slug,
+    images,
+    userId,
+    role,
+  });
 
-    // create slug
-    const slug = title.toLocaleLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-') +
-        ' ' + Date.now();
+  responseHandler(
+    res,
+    constants.CREATED,
+    'success',
+    `New Blog created for ${newBlogTitle}`,
+    { newBlogTitle }
+  );
+});
 
-    const newBlogTitle = await createBlogService({ title, content, slug, images, userId, role })
+// get blogs
+const getBlogs = asyncHandler(async (req, res, next) => {
+  const query = req.query;
+  if (!query)
+    return next(
+      new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    );
 
-    responseHandler(res, constants.CREATED, 'success', `New Blog created for ${newBlogTitle}`, { newBlogTitle })
-})
+  const blogs = await getBlogService(query);
 
-export { createBlog }
+  responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
+});
+export { createBlog, getBlogs };

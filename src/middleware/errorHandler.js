@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next) => {
 
   console.log('status -->', err.statusCode);
   const statusCode = err.statusCode;
-  const status = err.status;
+  const status = 'fail';
   const message = err.message;
 
   responseHandler(res, statusCode, status, message);

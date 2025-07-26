@@ -11,8 +11,8 @@ app.use(morgan('dev'));
 
 // routes
 import userRoute from './src/routes/user.route.js';
-import adminRoute from './src/routes/admin.route.js'
-import blogRoute from './src/routes/blog.route.js'
+import adminRoute from './src/routes/admin.route.js';
+import blogRoute from './src/routes/blog.route.js';
 
 app.use('/api/user', userRoute);
 app.use('/api/admin', adminRoute);
