@@ -126,6 +126,7 @@ const getBlogService = async (data) => {
                 createdAt: 1,
                 'user.email': 1,
                 'user.bio': 1,
+                'user.role': 1
             },
         },
         { $skip: !isUniqueQuery ? ((page - 1) * size || 0) : 0 },

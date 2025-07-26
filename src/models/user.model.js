@@ -15,20 +15,23 @@ const userModel = new Schema(
             unique: true,
         },
 
-        bio: {
-            name: String,
-            profile: String,
-            avatar: String,
+        name: {
+            type: String,
+            required: true,
+            unique: true,
         },
 
-        role: {
+        avatar: {
             type: String,
-            enum: ['admin', 'author', 'reader'],
-            default: 'reader',
+            required: true,
+            unique: true,
         },
 
         otp: { type: Number, default: null },
+        verfied: { type: Boolean, default: false }
+
     },
+
     { timestamps: true }
 );
 
