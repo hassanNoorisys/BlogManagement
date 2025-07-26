@@ -11,18 +11,18 @@ import responseHandler from '../utils/responseHandler.js';
 
 // registe user
 const registerUser = asyncHandler(async (req, res, next) => {
-    const { email, password, bio } = req.body;
 
-    if (!email || !password || !bio.name || !bio.profile)
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password)
         return next(
             new AppError(constants.BAD_REQUEST, 'All fields are required !!')
         );
 
     // handle image url
     const avatar = req.file.filename;
-    bio.avatar = avatar;
 
-    const data = await registerUserService({ email, password, bio });
+    const data = await registerUserService({ name, email, password, avatar });
 
     responseHandler(
         res,

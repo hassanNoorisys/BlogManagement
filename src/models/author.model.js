@@ -1,14 +1,31 @@
-import { Schema, Types } from 'mongoose';
-import userModel from './user.model';
+import { model, Schema, Types } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const authorSchema = new Schema(
 
     {
-
-        auhtor: {
-            type: Types.ObjectId,
+        authorEmail: {
+            type: String,
             required: true,
-            ref: 'user'
+            unique: true,
+        },
+
+        authorPassword: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+
+        authorName: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+
+        authorAvatar: {
+            type: String,
+            required: true,
+            unique: true,
         },
 
         bio: {
@@ -16,11 +33,21 @@ const authorSchema = new Schema(
             required: true,
         },
 
-        role: 'author'
+        role: String,
+        
+        authorOtp: { type: Number, default: null },
+        // verfied: { type: Boolean, default: false
     },
+
     { timestamps: true }
 );
 
-const authorModel = userModel.discriminator('Author', authorSchema);
 
-export default authorModel 
+authorSchema.pre('save', async function (next) {
+    if (this.isModified('authorPassword'))
+        this.authorPassword = await bcrypt.hash(this.authorPassword, 10);
+
+    next();
+});
+
+export default model('Author', authorSchema); 

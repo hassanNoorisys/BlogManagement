@@ -1,5 +1,5 @@
 import constants from '../config/constants.js';
-import userModel from '../models/user.model.js';
+// import userModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
 import sendEmail from '../utils/sendEmail.js';
 

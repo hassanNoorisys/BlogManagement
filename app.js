@@ -10,13 +10,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
 // routes
-import userRoute from './src/routes/user.route.js';
+import readerRoute from './src/routes/reader.routes.js';
 import adminRoute from './src/routes/admin.route.js';
 import blogRoute from './src/routes/blog.route.js';
+import authorRoute from './src/routes/author.route.js';
 
-app.use('/api/user', userRoute);
-app.use('/api/admin', adminRoute);
-app.use('/api/blog', blogRoute);
+app.use('/api/reader', readerRoute);
+app.use('/api/author', authorRoute);
+// app.use('/api/admin', adminRoute);
+// app.use('/api/blog', blogRoute);
 
 // error handler
 app.use(errorHandler);

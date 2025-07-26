@@ -1,16 +1,40 @@
 import { Schema, Types } from 'mongoose';
-
-import userModel from './user.model';
+import bcrypt from 'bcryptjs';
 
 const adminSchema = new Schema(
 
     {
-
-        admin: {
-            type: Types.ObjectId,
+        adminEmail: {
+            type: String,
             required: true,
-            ref: 'user'
+            unique: true,
         },
+
+        adminPassword: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+
+        adminName: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+
+        adminAvatar: {
+            type: String,
+            required: true,
+            unique: true,
+        },
+
+        bio: {
+            type: String,
+            required: true,
+        },
+
+        adminOtp: { type: Number, default: null },
+        // verfied: { type: Boolean, default: false
 
         role: 'admin'
 
@@ -18,6 +42,11 @@ const adminSchema = new Schema(
     { timestamps: true }
 );
 
-const adminModel = userModel.discriminator('Admin', adminSchema)
+adminSchema.pre('save', async function (next) {
+    if (this.isModified('adminPassword'))
+        this.adminPassword = await bcrypt.hash(this.adminPassword, 10);
 
-export default adminModel
+    next();
+});
+export default model('Admin', adminSchema)
+

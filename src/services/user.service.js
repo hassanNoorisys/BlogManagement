@@ -4,38 +4,39 @@ import AppError from '../utils/appError.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sendEmail from '../utils/sendEmail.js';
+import readerModel from '../models/reader.model.js';
 
 // register user service
-const registerUserService = async (data) => {
-    const { email, password, bio } = data;
+// const registerUserService = async (data) => {
+//     const { name, email, password, avatar } = data;
 
-    const existingUser = await userModel.findOne({ email });
+//     const existingUser = await userModel.findOne({ email });
 
-    if (existingUser)
-        throw new AppError(
-            constants.CONFLICT,
-            'User is already registered with this email'
-        );
+//     if (existingUser)
+//         throw new AppError(
+//             constants.CONFLICT,
+//             'User is already registered with this email'
+//         );
 
-    // send otp by email
-    const EMAIL_USER = process.env.EMAIL_USER;
+//     // send otp by email
+//     const EMAIL_USER = process.env.EMAIL_USER;
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await sendEmail(
-        EMAIL_USER,
-        email,
-        'Email Verification',
-        `Your OTP for blog management is ${otp}`
-    );
+//     await sendEmail(
+//         EMAIL_USER,
+//         email,
+//         'Email Verification',
+//         `Your OTP for blog management is ${otp}`
+//     );
 
-    // save user
-    const newUser = new userModel({ email, password, bio, otp });
+//     // save user
+//     const newUser = new readerModel({ name, email, password, avatar });
 
-    await newUser.save();
+//     await newUser.save();
 
-    return { email: newUser.email };
-};
+//     return { email: newUser.email };
+// };
 
 // verify email service
 const verifyEmailService = async (data) => {
@@ -54,29 +55,29 @@ const verifyEmailService = async (data) => {
 };
 
 // login user service
-const loginUsersService = async (data) => {
-    const { email, password } = data;
+// const loginUsersService = async (data) => {
+//     const { email, password } = data;
 
-    const existingUser = await userModel.findOne({ email });
+//     const existingUser = await userModel.findOne({ email });
 
-    if (!existingUser)
-        throw new AppError(constants.NOT_FOUND, 'User is not present');
+//     if (!existingUser)
+//         throw new AppError(constants.NOT_FOUND, 'User is not present');
 
-    const valid = await bcrypt.compare(password, existingUser.password);
-    if (!valid)
-        throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
+//     const valid = await bcrypt.compare(password, existingUser.password);
+//     if (!valid)
+//         throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
 
-    const SECRET_KEY = process.env.SECRET_KEY;
-    const token = jwt.sign(
-        { id: existingUser._id, role: existingUser.role },
-        SECRET_KEY,
-        {
-            expiresIn: '10d',
-        }
-    );
+//     const SECRET_KEY = process.env.SECRET_KEY;
+//     const token = jwt.sign(
+//         { id: existingUser._id, role: existingUser.role },
+//         SECRET_KEY,
+//         {
+//             expiresIn: '10d',
+//         }
+//     );
 
-    return token;
-};
+//     return token;
+// };
 
 // request author service
 const requestAuthorService = async (data) => {

@@ -1,7 +1,7 @@
 import { Types } from 'mongoose';
 import constants from '../config/constants.js';
 import blogModel from '../models/blog.model.js';
-import userModel from '../models/user.model.js';
+// import userModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
 
 // create blog service
