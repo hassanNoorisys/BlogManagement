@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Types } from 'mongoose';
 
 const blogSchema = new Schema(
     {
@@ -40,6 +40,12 @@ const blogSchema = new Schema(
         likeCount: Number,
 
         dislikeCount: Number,
+
+        likedBy: [{ type: Types.ObjectId, ref: 'reader' }],
+
+        disLikedBy: [{ type: Types.ObjectId, ref: 'reader' }],
+
+        favouritedBy: [{ type: Types.ObjectId, ref: 'reader' }],
     },
     { timestamps: true }
 );

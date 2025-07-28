@@ -6,6 +6,7 @@ import AppError from '../utils/appError.js';
 import adminModel from '../models/admin.model.js'
 import authorModel from '../models/author.model.js'
 import fs from 'fs/promises'
+import readerModel from '../models/reader.model.js';
 
 // create blog service
 const createBlogService = async (data) => {
@@ -193,4 +194,71 @@ const updateBlogService = async (filter, data) => {
     return updatedBlog.title
 }
 
-export { createBlogService, getBlogService, updateBlogService };
+// like or dislike blog
+const blogActionService = async (filter) => {
+
+    const { action, userId, blogId } = filter
+
+    const [reader, blog] = await Promise.all([
+
+        readerModel.findById({ _id: userId }),
+        blogModel.findById({ _id: blogId })
+    ])
+
+    if (!blog || !reader) throw new AppError(constants.BAD_REQUEST, 'User or blog does not exist')
+
+    // console.log('like blog service -->  ', blog, action)
+
+    if (action === 'liked') {
+
+        await Promise.all([
+
+            // update reader model 
+            readerModel.findByIdAndUpdate({ _id: userId },
+
+                {
+                    $pull: { dislikedBlog: blogId },
+                    $addToSet: { likedBlog: blogId }
+                }
+
+            ),
+
+            // update blog model based 
+            blogModel.findByIdAndUpdate({ _id: blogId },
+
+                {
+                    $addToSet: { likedBy: userId },
+                    $pull: { disLikedBy: userId },
+                    $inc: { likeCount: 1 }
+                }
+            ),
+        ])
+
+    } else {
+
+        await Promise.all([
+
+            // update reader model based 
+            readerModel.findByIdAndUpdate({ _id: userId },
+
+                {
+                    $pull: { likedBlog: blogId },
+                    $addToSet: { dislikedBlog: blogId }
+                }
+            ),
+
+            // update blog model based 
+            blogModel.findByIdAndUpdate({ _id: blogId },
+
+                {
+                    $addToSet: { disLikedBy: userId },
+                    $pull: { likedBy: userId },
+                    $inc: { dislikeCount: 1 }
+                }
+
+            ),
+        ])
+    }
+}
+
+export { createBlogService, getBlogService, updateBlogService, blogActionService };

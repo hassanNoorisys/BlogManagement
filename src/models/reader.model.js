@@ -1,5 +1,6 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { ref } from 'process';
 
 const readerSchema = new Schema(
     {
@@ -30,7 +31,36 @@ const readerSchema = new Schema(
         role: String,
 
         readerOtp: { type: Number, default: null },
+
         // verfied: { type: Boolean, default: false }
+
+
+        favouriteBlog: [
+
+            {
+                type: Types.ObjectId,
+                ref: 'blog',
+                required: true
+            }
+        ],
+
+        likedBlog: [
+
+            {
+                type: Types.ObjectId,
+                ref: 'blog',
+                required: true
+            }
+        ],
+
+        dislikedBlog: [
+
+            {
+                type: Types.ObjectId,
+                ref: 'blog',
+                required: true
+            }
+        ]
     },
 
 

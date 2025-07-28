@@ -1,8 +1,9 @@
-import { createBlogService, getBlogService, updateBlogService } from '../services/blog.service.js';
+import { blogActionService, createBlogService, getBlogService, updateBlogService } from '../services/blog.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
 import constants from '../config/constants.js';
+import AppError from '../utils/appError.js';
 
 
 // create blog
@@ -104,9 +105,28 @@ const updateBlog = asyncHandler(async (req, res, next) => {
     responseHandler(res, constants.OK, 'success', 'Blog updated successfully', { title: updatedBlogTitle })
 })
 
+// like or dislike blog
+const likeOrDislike = asyncHandler(async (req, res, next) => {
+
+    const { action } = req.body
+    const userId = req.user.id
+    const blogId = req.params.id
+
+    // console.log('like blog -->  ', blogId, action)
+
+    if (!['liked', 'disliked'].includes(action) || !blogId) next(new AppError(constants.BAD_REQUEST, 'invalid action'))
+
+    await blogActionService({ action, userId, blogId })
+
+    responseHandler(res, constants.OK, 'success', action)
+
+
+})
+
 
 export {
     createBlog,
     getBlogs,
-    updateBlog
+    updateBlog,
+    likeOrDislike
 };

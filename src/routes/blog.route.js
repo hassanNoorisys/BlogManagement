@@ -2,7 +2,7 @@ import { Router } from 'express';
 import verifyRole from '../middleware/verifyRole.js';
 import verifyToken from '../middleware/verifyToken.js';
 import blogImageUpload from '../middleware/uploadBlogImage.js';
-import { createBlog, getBlogs, updateBlog } from '../controllers/blog.controller.js';
+import { createBlog, getBlogs, likeOrDislike, updateBlog } from '../controllers/blog.controller.js';
 
 const route = Router();
 
@@ -17,5 +17,8 @@ route.post(
 route.get('/', getBlogs);
 
 route.patch('/:id', blogImageUpload.array('images'), verifyToken, verifyRole('Admin', 'Author'), updateBlog)
+
+// like or dislike blog
+route.post('/action/:id', verifyToken, likeOrDislike)
 
 export default route;

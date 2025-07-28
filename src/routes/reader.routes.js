@@ -8,8 +8,8 @@ const route = Router();
 // login and registration
 route
     .post('/register', profileImageUpload.single('avatar'), registerReader)
-    // .post('/verify-email', verifyEmail)
     .post('/login', loginReader);
+    // .post('/verify-email', verifyEmail)
 
 // request route
 // route.post('/request-author-role', verifyToken, requestAuthorRole);
