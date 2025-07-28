@@ -16,6 +16,6 @@ route.post(
 
 route.get('/', getBlogs);
 
-route.patch('/:id', verifyToken, verifyRole('Admin', 'Author'), updateBlog)
+route.patch('/:id', blogImageUpload.array('images'), verifyToken, verifyRole('Admin', 'Author'), updateBlog)
 
 export default route;

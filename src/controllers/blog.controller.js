@@ -4,6 +4,7 @@ import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
 import constants from '../config/constants.js';
 
+
 // create blog
 const createBlog = asyncHandler(async (req, res, next) => {
     const userId = new Types.ObjectId(req.user.id);
@@ -78,27 +79,32 @@ const updateBlog = asyncHandler(async (req, res, next) => {
         );
 
     // handle images
+    let images = []
     if (req.files) {
 
+        for (let file of req.files) {
+
+            for (let file of req.files) {
+                images.push({ url: file.filename, alt: title });
+            }
+        }
     }
 
     let slug = '';
     if (title) slug = title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') + '-' + Date.now();
 
-
-    console.log('update blog --> ', typeof slug)
-
     const updatedBlogTitle = await updateBlogService(blogId, {
 
         ...(title && { title }),
         ...(content && { content }),
+        ...(req.files && { images }),
         'slug': slug
     })
 
-    console.log(Date.now())
-
     responseHandler(res, constants.OK, 'success', 'Blog updated successfully', { title: updatedBlogTitle })
 })
+
+
 export {
     createBlog,
     getBlogs,

@@ -5,6 +5,7 @@ import blogModel from '../models/blog.model.js';
 import AppError from '../utils/appError.js';
 import adminModel from '../models/admin.model.js'
 import authorModel from '../models/author.model.js'
+import fs from 'fs/promises'
 
 // create blog service
 const createBlogService = async (data) => {
@@ -172,10 +173,24 @@ const getBlogService = async (data) => {
 // update blog
 const updateBlogService = async (filter, data) => {
 
-    const update = await blogModel.findByIdAndUpdate({ _id: filter }, data, { new: true })
+    // TODO: find the blog then delete the image if image is updated
+    // const oldBlog = await blogModel.findById(filter)
+
+    // if (data.images) {
+
+    //     for (let image of data.images) {
+
+    //         console.log()
+    //         await fs.unlink(image.url)
+    //     }
+    // }
+
+    const updatedBlog = await blogModel.findByIdAndUpdate({ _id: filter }, data, { new: true })
         .select(['title'])
 
-    return update
+    console.log('update blog service --> ', updatedBlog)
+
+    return updatedBlog.title
 }
 
 export { createBlogService, getBlogService, updateBlogService };
