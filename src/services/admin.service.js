@@ -135,7 +135,8 @@ const getAuthorsService = async (query) => {
 
         ...(query.name && { authorName: query.name }),
         ...(query.email && { authorEmail: query.email }),
-        ...(query.id && { _id: query.id })
+        ...(query.id && { _id: query.id }),
+        ...(query.inactive && { isDeleted: query.inactive })
     }
 
     const { page, size } = query
@@ -167,6 +168,8 @@ const softDeleteAuthorService = async (filter) => {
 
     return data
 }
+
+
 export {
 
     registerAdminService,
