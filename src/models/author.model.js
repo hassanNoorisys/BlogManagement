@@ -30,7 +30,6 @@ const authorSchema = new Schema(
 
         bio: {
             type: String,
-            required: true,
         },
 
         role: String,

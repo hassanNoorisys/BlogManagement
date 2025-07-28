@@ -16,6 +16,6 @@ route
 
 
 // admin realted routes
-route.post('/create-author', verifyToken, verifyRole('admin'), createAuthor);
+route.post('/create-author', verifyToken, verifyRole('Admin'), createAuthor);
 
 export default route;

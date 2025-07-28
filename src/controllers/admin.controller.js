@@ -53,14 +53,14 @@ const loginAdmin = asyncHandler(async (req, res, next) => {
 
 // create author
 const createAuthor = asyncHandler(async (req, res, next) => {
-    const { email } = req.body;
+    const { readerEmail } = req.body;
 
-    if (!email)
+    if (!readerEmail)
         return next(
             new AppError(constants.BAD_REQUEST, 'All Fields are required')
         );
 
-    await createAuthorService({ email });
+    await createAuthorService({ readerEmail });
 
     responseHandler(res, constants.OK, 'success', 'The user is now an author');
 });

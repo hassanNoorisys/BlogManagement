@@ -5,7 +5,8 @@ import AppError from '../utils/appError.js';
 import sendEmail from '../utils/sendEmail.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
-
+import authorModel from '../models/author.model.js'
+import readerModel from '../models/reader.model.js'
 
 // register author service
 const registerAdminService = async (data) => {
@@ -66,23 +67,43 @@ const loginAdminService = async (data) => {
 
 // create author service
 const createAuthorService = async (data) => {
-    const { email } = data;
+    const { readerEmail } = data;
 
-    const existingUser = await userModel.findOneAndUpdate(
-        { email },
-        { role: 'author' }
-    );
+    const [author, reader] = await Promise.all([
 
-    if (!existingUser)
-        throw new AppError(constants.SERVER_ERROR, 'Something went wrong');
+        authorModel.findOne({ authorEmail: readerEmail }),
+        readerModel.findOne({ readerEmail })
+    ])
+
+    if (author && author.role === 'Author')
+        throw new AppError(constants.CONFLICT, 'User is already an Author');
+
+    if (!reader) throw new AppError('User is not registed')
+
+    const newAuthor = new authorModel({
+        authorEmail: readerEmail,
+        authorPassword: reader.readerPassword,
+        authorName: reader.readerName,
+        authorAvatar: reader.readerAvatar,
+        role: 'Author'
+    })
+
+    await newAuthor.save()
+
+    await reader.deleteOne({ readerEmail })
+
+    // console.log('create author service --> ', reader, author)
 
     // send an email to user to notify that he is now an author
     const EMAIL_USER = process.env.EMAIL_USER;
     await sendEmail(
         EMAIL_USER,
-        email,
-        'Request permission to become author',
-        `You are now author`
+        readerEmail,
+        'Request permission to become an author',
+        `You are now author, you can use the blog management service,
+        Update your bio in your profile to showcase yourself, 
+        
+        Thanks for using our platform`
     );
 };
 
