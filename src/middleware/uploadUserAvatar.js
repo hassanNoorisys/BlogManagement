@@ -6,8 +6,6 @@ import path from 'path';
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        if (!file)
-            throw new AppError(constants.BAD_REQUEST, 'Image is required');
 
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);

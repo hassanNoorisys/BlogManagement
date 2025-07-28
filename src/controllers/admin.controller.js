@@ -1,7 +1,7 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
-import { createAuthorService, getAdminSerivce, loginAdminService, registerAdminService } from '../services/admin.service.js';
+import { createAuthorService, getAdminSerivce, loginAdminService, registerAdminService, updateAdminService } from '../services/admin.service.js';
 import responseHandler from '../utils/responseHandler.js';
 
 
@@ -83,4 +83,23 @@ const getAdmin = asyncHandler(async (req, res, next) => {
 
 })
 
-export { registerAdmin, loginAdmin, createAuthor, getAdmin }
+// update admin 
+const updateAdmin = asyncHandler(async (req, res, next) => {
+
+    const data = req.body
+
+    const dataTobeUpdated = {
+        ...(data.name && { adminName: data.name }),
+        ...(data.email && { adminEmail: data.email }),
+        ...(req.file && { adminAvatar: req.file.filename })
+    }
+
+    const filter = req.user.id
+
+    await updateAdminService(filter, dataTobeUpdated)
+
+    responseHandler(res, constants.OK, 'success', 'Profile updated successfully')
+
+})
+
+export { registerAdmin, loginAdmin, createAuthor, getAdmin, updateAdmin }

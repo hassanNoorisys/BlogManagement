@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken'
 import authorModel from '../models/author.model.js'
 import readerModel from '../models/reader.model.js'
 
-// register author service
+// register admin service
 const registerAdminService = async (data) => {
     const { adminEmail, adminPassword, adminName, adminAvatar } = data;
 
@@ -40,7 +40,7 @@ const registerAdminService = async (data) => {
     return { email: newReader.adminEmail };
 };
 
-// login author service
+// login admin service
 const loginAdminService = async (data) => {
     const { adminEmail, adminPassword } = data;
 
@@ -65,7 +65,7 @@ const loginAdminService = async (data) => {
     return token;
 };
 
-// create author service
+// create admin service
 const createAuthorService = async (data) => {
     const { readerEmail } = data;
 
@@ -107,23 +107,31 @@ const createAuthorService = async (data) => {
     );
 };
 
-// get authors service
+// get admin service
 const getAdminSerivce = async (query) => {
 
     const admin = await adminModel.findOne({ _id: query })
         .select(['-adminPassword', '-createdAt', '-updatedAt', '-adminOtp']).lean()
 
-    console.log('admin service --> ', admin)
+    // console.log('admin service --> ', admin)
 
     if (!admin) throw new AppError(constants.NO_CONTENT, 'No admin found')
 
     return admin
 }
 
+// update admin service
+const updateAdminService = async (filter, dataTobeUpdated) => {
+
+    const updated = await adminModel.findByIdAndUpdate(filter, dataTobeUpdated)
+
+    console.log('update admin service -->', updated)
+}
 export {
 
     registerAdminService,
     loginAdminService,
     createAuthorService,
-    getAdminSerivce
+    getAdminSerivce,
+    updateAdminService
 }
