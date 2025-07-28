@@ -1,4 +1,4 @@
-import { Schema, Types } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const adminSchema = new Schema(
@@ -28,15 +28,11 @@ const adminSchema = new Schema(
             unique: true,
         },
 
-        bio: {
-            type: String,
-            required: true,
-        },
 
         adminOtp: { type: Number, default: null },
         // verfied: { type: Boolean, default: false
 
-        role: 'admin'
+        role: String
 
     },
     { timestamps: true }
@@ -48,5 +44,6 @@ adminSchema.pre('save', async function (next) {
 
     next();
 });
+
 export default model('Admin', adminSchema)
 

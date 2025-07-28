@@ -17,7 +17,7 @@ import authorRoute from './src/routes/author.route.js';
 
 app.use('/api/reader', readerRoute);
 app.use('/api/author', authorRoute);
-// app.use('/api/admin', adminRoute);
+app.use('/api/admin', adminRoute);
 // app.use('/api/blog', blogRoute);
 
 // error handler
