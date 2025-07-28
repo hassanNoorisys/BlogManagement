@@ -63,38 +63,8 @@ const loginAuthorService = async (data) => {
     return token;
 };
 
-// get authors service
-const getAuthorsService = async (query) => {
-
-    const filter = {
-
-        ...(query.name && { authorName: query.name }),
-        ...(query.email && { authorEmail: query.email }),
-        ...(query.id && { _id: query.id })
-    }
-
-    const { page, size } = query
-
-    const isUnique = query.id || query.name || query.email
-
-    const authors = await authorModel.find(filter)
-        .select(['-password', '-createdAt', '-updatedAt', '-authorOtp'])
-
-        .skip(!isUnique ? (page - 1) * size || 0 : 0)
-        .limit(!isUnique ? size || 5 : 0)
-
-        .lean()
-
-    console.log('author service --> ', authors)
-
-    if (!authors || authors.length < 1) throw new AppError(constants.NO_CONTENT, 'No auhtors found')
-
-    return authors
-}
-
 export {
 
     registerAuthorService,
     loginAuthorService,
-    getAuthorsService
 }

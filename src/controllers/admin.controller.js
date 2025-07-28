@@ -1,7 +1,7 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
-import { createAuthorService, getAdminSerivce, loginAdminService, registerAdminService, updateAdminService } from '../services/admin.service.js';
+import { createAuthorService, getAdminSerivce, getAuthorsService, loginAdminService, registerAdminService, softDeleteAuthorService, updateAdminService } from '../services/admin.service.js';
 import responseHandler from '../utils/responseHandler.js';
 
 
@@ -102,4 +102,43 @@ const updateAdmin = asyncHandler(async (req, res, next) => {
 
 })
 
-export { registerAdmin, loginAdmin, createAuthor, getAdmin, updateAdmin }
+
+// related to management of authors
+
+// get authors
+const getAuthors = asyncHandler(async (req, res, next) => {
+
+    const query = req.query;
+
+    console.log(query)
+    if (!query)
+        return next(
+            new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+        );
+
+    const authors = await getAuthorsService(query);
+
+    responseHandler(res, constants.OK, 'success', 'Authors found', { authors });
+
+})
+
+
+// soft delete author
+const softDelteAuthor = asyncHandler(async (req, res, next) => {
+
+
+    const email = req.quey.email
+
+    if (!email) return next(
+        new AppError(constants.BAD_REQUEST, 'All Email is required !!')
+    );
+
+
+    await softDeleteAuthorService(email)
+
+    responseHandler(res, constants.OK, 'success', 'Author deleted successfully')
+
+})
+
+
+export { registerAdmin, loginAdmin, createAuthor, getAdmin, updateAdmin, softDelteAuthor, getAuthors }

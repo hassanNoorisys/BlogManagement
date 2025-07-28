@@ -32,8 +32,15 @@ const authorSchema = new Schema(
             type: String,
         },
 
+        isDeleted: {
+            type: Boolean,
+            default: false
+        },
+
+        deletedAt: Date,
+
         role: String,
-        
+
         authorOtp: { type: Number, default: null },
         // verfied: { type: Boolean, default: false
     },
