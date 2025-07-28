@@ -1,4 +1,4 @@
-import { blogActionService, createBlogService, getBlogService, updateBlogService } from '../services/blog.service.js';
+import { addToFavouriteService, blogActionService, createBlogService, getBlogService, updateBlogService } from '../services/blog.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
@@ -124,8 +124,18 @@ const likeOrDislike = asyncHandler(async (req, res, next) => {
 })
 
 // make blog favourite
-const makeFavourite = asyncHandler(async (req, res, next) => {
+const addToFavourite = asyncHandler(async (req, res, next) => {
 
+    const blogId = req.params.id
+    const userId = req.user.id
+
+    if (!blogId) return next(
+        new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    );
+
+    await addToFavouriteService(userId, blogId)
+
+    responseHandler(res, constants.OK, 'success', 'Added to Favourites')
 })
 
 export {
@@ -133,5 +143,5 @@ export {
     getBlogs,
     updateBlog,
     likeOrDislike,
-    makeFavourite
+    addToFavourite
 };

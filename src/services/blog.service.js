@@ -195,9 +195,9 @@ const updateBlogService = async (filter, data) => {
 }
 
 // like or dislike blog
-const blogActionService = async (filter) => {
+const blogActionService = async (filter, action) => {
 
-    const { action, userId, blogId } = filter
+    const { userId, blogId } = filter
 
     const [reader, blog] = await Promise.all([
 
@@ -293,4 +293,26 @@ const blogActionService = async (filter) => {
     await Promise.all(updateOps);
 }
 
-export { createBlogService, getBlogService, updateBlogService, blogActionService };
+// make blog fabourite
+const addToFavouriteService = async (userId, blogId) => {
+
+    const [reader, blog] = await Promise.all([
+
+        readerModel.findOne({ _id: userId }),
+        blogModel.findOne({ _id: blogId })
+    ])
+
+    if (!blog || !reader) throw new AppError(constants.BAD_REQUEST, 'User or blog does not exist')
+
+    const alreadyFavouite = blog.favouritedBy.includes(userId)
+
+    if (alreadyFavouite) return
+
+    await Promise.all([
+
+        readerModel.updateOne({ _id: userId }, { $addToSet: { favouriteBlog: blogId } }),
+        blogModel.updateOne({ _id: blogId }, { $addToSet: { favouritedBy: userId }, $inc: { favouriteCount: 1 } })
+    ])
+}
+
+export { createBlogService, getBlogService, updateBlogService, blogActionService, addToFavouriteService };
