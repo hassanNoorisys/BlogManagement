@@ -8,26 +8,6 @@ import authorModel from '../models/author.model.js'
 import fs from 'fs/promises'
 import readerModel from '../models/reader.model.js';
 
-// create blog service
-const createBlogService = async (data) => {
-    const { title, content, images, userId, role, slug } = data;
-
-    const [admin, author] = await Promise.all([
-        adminModel.findOne({ _id: userId }),
-        authorModel.findOne({ _id: userId })
-    ])
-
-    if (!admin && !author && author.isDeleted == true)
-        throw new AppError(constants.UNAUTHORIZED, 'User not registered');
-
-    const user = role === 'admin' ? { admin: userId } : { author: userId };
-
-    const newBlog = new blogModel({ title, content, images, slug, ...user });
-    await newBlog.save();
-
-    return title;
-};
-
 const getBlogPipeline = [
     {
         $lookup: {
@@ -77,6 +57,26 @@ const getBlogPipeline = [
         },
     },
 ]
+
+// create blog service
+const createBlogService = async (data) => {
+    const { title, content, images, userId, role, slug } = data;
+
+    const [admin, author] = await Promise.all([
+        adminModel.findOne({ _id: userId }),
+        authorModel.findOne({ _id: userId })
+    ])
+
+    if (!admin && !author && author.isDeleted == true)
+        throw new AppError(constants.UNAUTHORIZED, 'User not registered');
+
+    const user = role === 'admin' ? { admin: userId } : { author: userId };
+
+    const newBlog = new blogModel({ title, content, images, slug, ...user });
+    await newBlog.save();
+
+    return title;
+};
 
 // get blog service
 const getBlogService = async (data) => {
@@ -384,7 +384,7 @@ const getFavouriteBlogsService = async (query, userId) => {
         },
 
         ...getBlogPipeline,
-        
+
         ...(blogOwnerName
             ? [
                 {
