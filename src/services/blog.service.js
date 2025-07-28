@@ -79,7 +79,7 @@ const getBlogService = async (data) => {
             }
             : {}),
     };
-    console.log('feth blogs services--> ', filter)
+    // console.log('feth blogs services--> ', filter)
 
     const isUniqueQuery = id || slug
     const blogs = await blogModel.aggregate([
@@ -315,4 +315,152 @@ const addToFavouriteService = async (userId, blogId) => {
     ])
 }
 
-export { createBlogService, getBlogService, updateBlogService, blogActionService, addToFavouriteService };
+// get all favourite blogs
+const getFavouriteBlogsService = async (query, userId) => {
+
+
+    const {
+        title,
+        slug,
+        blogOwnerName,
+        id,
+
+        toYear,
+        toMonth,
+        toDay,
+
+        fromYear,
+        fromMonth,
+        fromDay,
+
+        page,
+        size
+    } = query;
+
+    const fy =
+        typeof fromYear !== 'undefined'
+            ? Number(fromYear)
+            : new Date().getFullYear();
+    const fm = typeof fromMonth !== 'undefined' ? Number(fromMonth) - 1 : 0;
+    const fd = typeof fromDay !== 'undefined' ? Number(fromDay) : 1;
+
+    const ty = typeof toYear !== 'undefined'
+        ? Number(toYear)
+        : new Date().getFullYear();
+
+    const tm = typeof toMonth !== 'undefined' ? Number(toMonth) - 1 : 0;
+    const td = typeof toDay !== 'undefined' ? Number(toDay) : 1;
+
+    const from = new Date(fy, fm, fd);
+    const to = new Date(ty, tm, td + 1);
+
+    const filter = {
+
+        favouritedBy: new Types.ObjectId(userId),
+        ...(slug && { slug }),
+        ...(id && { _id: new Types.ObjectId(id) }),
+        ...(title && { title }),
+        ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
+            ? {
+                createdAt: {
+                    $gte: from,
+                    $lt: to,
+                },
+            }
+            : {}),
+    };
+
+
+    const isUniqueQuery = id || slug
+    const blogs = await blogModel.aggregate([
+        {
+            $match: filter,
+        },
+        {
+            $lookup: {
+                from: 'admins',
+                localField: 'admin',
+                foreignField: '_id',
+                as: 'admin',
+            },
+        },
+        {
+            $lookup: {
+                from: 'authors',
+                localField: 'author',
+                foreignField: '_id',
+                as: 'author',
+            },
+        },
+        {
+            $addFields: {
+                user: {
+                    $cond: {
+                        if: { $gt: [{ $size: '$author' }, 0] },
+                        then: {
+                            $mergeObjects: [
+                                { $arrayElemAt: ['$author', 0] },
+                                {
+                                    email: { $arrayElemAt: ['$author.authorEmail', 0] },
+                                    name: { $arrayElemAt: ['$author.authorName', 0] },
+                                    avatar: { $arrayElemAt: ['$author.authorAvatar', 0] },
+                                    bio: { $arrayElemAt: ['$author.bio', 0] },
+                                }
+                            ],
+                        },
+                        else: {
+                            $mergeObjects: [
+                                { $arrayElemAt: ['$admin', 0] },
+                                {
+                                    email: { $arrayElemAt: ['$admin.adminEmail', 0] },
+                                    name: { $arrayElemAt: ['$admin.adminName', 0] },
+                                    avatar: { $arrayElemAt: ['$admin.adminAvatar', 0] },
+                                    bio: null,
+                                }
+                            ],
+                        },
+                    },
+                },
+            },
+        },
+        ...(blogOwnerName
+            ? [
+                {
+                    $match: {
+                        'user.name': {
+                            $regex: blogOwnerName,
+                            $options: 'i',
+                        },
+                    },
+                },
+            ]
+            : []),
+        {
+            $project: {
+                title: 1,
+                slug: 1,
+                content: 1,
+                createdAt: 1,
+                'user.email': 1,
+                'user.name': 1,
+                'user.avatar': 1,
+                'user.bio': 1,
+                'user.role': 1,
+            },
+        },
+        { $skip: !isUniqueQuery ? ((page - 1) * size || 0) : 0 },
+        { $limit: Number(!isUniqueQuery ? size || 5 : 1) },
+    ]);
+
+    console.log('favourte blog service --> ', filter)
+    if (!blogs || blogs.length < 1) throw new AppError(constants.NO_CONTENT, 'Blog not found');
+
+    return blogs
+}
+
+export {
+    createBlogService,
+    getBlogService, updateBlogService,
+    blogActionService, addToFavouriteService,
+    getFavouriteBlogsService
+};
