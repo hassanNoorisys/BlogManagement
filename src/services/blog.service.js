@@ -28,6 +28,56 @@ const createBlogService = async (data) => {
     return title;
 };
 
+const getBlogPipeline = [
+    {
+        $lookup: {
+            from: 'admins',
+            localField: 'admin',
+            foreignField: '_id',
+            as: 'admin',
+        },
+    },
+    {
+        $lookup: {
+            from: 'authors',
+            localField: 'author',
+            foreignField: '_id',
+            as: 'author',
+        },
+    },
+    {
+        $addFields: {
+            user: {
+                $cond: {
+                    if: { $gt: [{ $size: '$author' }, 0] },
+                    then: {
+                        $mergeObjects: [
+                            { $arrayElemAt: ['$author', 0] },
+                            {
+                                email: { $arrayElemAt: ['$author.authorEmail', 0] },
+                                name: { $arrayElemAt: ['$author.authorName', 0] },
+                                avatar: { $arrayElemAt: ['$author.authorAvatar', 0] },
+                                bio: { $arrayElemAt: ['$author.bio', 0] },
+                            }
+                        ],
+                    },
+                    else: {
+                        $mergeObjects: [
+                            { $arrayElemAt: ['$admin', 0] },
+                            {
+                                email: { $arrayElemAt: ['$admin.adminEmail', 0] },
+                                name: { $arrayElemAt: ['$admin.adminName', 0] },
+                                avatar: { $arrayElemAt: ['$admin.adminAvatar', 0] },
+                                bio: null,
+                            }
+                        ],
+                    },
+                },
+            },
+        },
+    },
+]
+
 // get blog service
 const getBlogService = async (data) => {
     const {
@@ -86,53 +136,9 @@ const getBlogService = async (data) => {
         {
             $match: filter,
         },
-        {
-            $lookup: {
-                from: 'admins',
-                localField: 'admin',
-                foreignField: '_id',
-                as: 'admin',
-            },
-        },
-        {
-            $lookup: {
-                from: 'authors',
-                localField: 'author',
-                foreignField: '_id',
-                as: 'author',
-            },
-        },
-        {
-            $addFields: {
-                user: {
-                    $cond: {
-                        if: { $gt: [{ $size: '$author' }, 0] },
-                        then: {
-                            $mergeObjects: [
-                                { $arrayElemAt: ['$author', 0] },
-                                {
-                                    email: { $arrayElemAt: ['$author.authorEmail', 0] },
-                                    name: { $arrayElemAt: ['$author.authorName', 0] },
-                                    avatar: { $arrayElemAt: ['$author.authorAvatar', 0] },
-                                    bio: { $arrayElemAt: ['$author.bio', 0] },
-                                }
-                            ],
-                        },
-                        else: {
-                            $mergeObjects: [
-                                { $arrayElemAt: ['$admin', 0] },
-                                {
-                                    email: { $arrayElemAt: ['$admin.adminEmail', 0] },
-                                    name: { $arrayElemAt: ['$admin.adminName', 0] },
-                                    avatar: { $arrayElemAt: ['$admin.adminAvatar', 0] },
-                                    bio: null,
-                                }
-                            ],
-                        },
-                    },
-                },
-            },
-        },
+
+        ...getBlogPipeline,
+
         ...(blogOwnerName
             ? [
                 {
@@ -376,53 +382,9 @@ const getFavouriteBlogsService = async (query, userId) => {
         {
             $match: filter,
         },
-        {
-            $lookup: {
-                from: 'admins',
-                localField: 'admin',
-                foreignField: '_id',
-                as: 'admin',
-            },
-        },
-        {
-            $lookup: {
-                from: 'authors',
-                localField: 'author',
-                foreignField: '_id',
-                as: 'author',
-            },
-        },
-        {
-            $addFields: {
-                user: {
-                    $cond: {
-                        if: { $gt: [{ $size: '$author' }, 0] },
-                        then: {
-                            $mergeObjects: [
-                                { $arrayElemAt: ['$author', 0] },
-                                {
-                                    email: { $arrayElemAt: ['$author.authorEmail', 0] },
-                                    name: { $arrayElemAt: ['$author.authorName', 0] },
-                                    avatar: { $arrayElemAt: ['$author.authorAvatar', 0] },
-                                    bio: { $arrayElemAt: ['$author.bio', 0] },
-                                }
-                            ],
-                        },
-                        else: {
-                            $mergeObjects: [
-                                { $arrayElemAt: ['$admin', 0] },
-                                {
-                                    email: { $arrayElemAt: ['$admin.adminEmail', 0] },
-                                    name: { $arrayElemAt: ['$admin.adminName', 0] },
-                                    avatar: { $arrayElemAt: ['$admin.adminAvatar', 0] },
-                                    bio: null,
-                                }
-                            ],
-                        },
-                    },
-                },
-            },
-        },
+
+        ...getBlogPipeline,
+        
         ...(blogOwnerName
             ? [
                 {
