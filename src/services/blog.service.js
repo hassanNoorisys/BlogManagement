@@ -3,16 +3,20 @@ import constants from '../config/constants.js';
 import blogModel from '../models/blog.model.js';
 // import userModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
+import adminModel from '../models/admin.model.js'
+import authorModel from '../models/author.model.js'
 
 // create blog service
 const createBlogService = async (data) => {
     const { title, content, images, userId, role, slug } = data;
 
-    const existingUser = await userModel
-        .findOne({ _id: userId })
-        .select(['_id']);
-    if (!existingUser)
-        throw new AppError(constants.SERVER_ERROR, 'Something went wrong');
+    const [admin, author] = await Promise.all([
+        adminModel.findOne({ _id: userId }),
+        authorModel.findOne({ _id: userId })
+    ])
+
+    if (!admin && !author && author.isDeleted == true)
+        throw new AppError(constants.UNAUTHORIZED, 'User not registered');
 
     const user = role === 'admin' ? { admin: userId } : { author: userId };
 

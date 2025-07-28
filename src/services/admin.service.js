@@ -169,7 +169,6 @@ const softDeleteAuthorService = async (filter) => {
     return data
 }
 
-
 export {
 
     registerAdminService,

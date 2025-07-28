@@ -9,13 +9,13 @@ const route = Router();
 route.post(
     '/create',
     verifyToken,
-    verifyRole('admin', 'author'),
+    verifyRole('Admin', 'Author'),
     blogImageUpload.array('images'),
     createBlog
 );
 
 route.get('/', getBlogs);
 
-route.patch('/:id', verifyToken, verifyRole('admin', 'author'), updateBlog)
+route.patch('/:id', verifyToken, verifyRole('Admin', 'Author'), updateBlog)
 
 export default route;

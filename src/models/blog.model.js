@@ -4,12 +4,12 @@ const blogSchema = new Schema(
     {
         author: {
             type: Schema.Types.ObjectId,
-            ref: 'user',
+            ref: 'Author',
         },
 
         admin: {
             type: Schema.Types.ObjectId,
-            ref: 'user',
+            ref: 'Admin',
         },
 
         title: {
