@@ -122,21 +122,25 @@ const getAuthors = asyncHandler(async (req, res, next) => {
 
 })
 
-
 // soft delete author
 const softDelteAuthor = asyncHandler(async (req, res, next) => {
 
 
-    const email = req.quey.email
+    const query = req.query
+    const filter = {
 
-    if (!email) return next(
+        ...(query.email && { authorEmail: query.email }),
+        ...(query.id && { _id: query.id })
+    }
+
+    if (!query.email) return next(
         new AppError(constants.BAD_REQUEST, 'All Email is required !!')
     );
 
 
-    await softDeleteAuthorService(email)
+    const deletedAuthor = await softDeleteAuthorService(filter)
 
-    responseHandler(res, constants.OK, 'success', 'Author deleted successfully')
+    responseHandler(res, constants.OK, 'success', 'Author deleted successfully', deletedAuthor)
 
 })
 

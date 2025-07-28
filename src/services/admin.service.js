@@ -158,8 +158,14 @@ const getAuthorsService = async (query) => {
 }
 
 // soft delete author
-const softDeleteAuthorService = async () => {
+const softDeleteAuthorService = async (filter) => {
 
+    const data = await authorModel.findOneAndUpdate(filter, { isDeleted: true, deletedAt: Date.now() }, { new: true }
+    ).select(['authorEmail', 'authorName'])
+
+    console.log('delete author service --> ', filter, data)
+
+    return data
 }
 export {
 

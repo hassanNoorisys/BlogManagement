@@ -2,7 +2,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
 import responseHandler from '../utils/responseHandler.js';
-import { getAuthorsService, loginAuthorService, registerAuthorService, softDeleteAuthorService } from "../services/author.service.js";
+import { loginAuthorService, registerAuthorService } from "../services/author.service.js";
 
 // register reader
 const registerAuthor = asyncHandler(async (req, res, next) => {

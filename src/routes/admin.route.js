@@ -16,15 +16,15 @@ route
 
 
 // admin realted routes
-route.post('/create-author', verifyToken, verifyRole('Admin'), createAuthor);
+route.post('/author/create', verifyToken, verifyRole('Admin'), createAuthor);
 
 route.get('/', verifyToken, verifyRole('Admin'), getAdmin)
     .patch('/', profileImageUpload.single('avatar'), verifyToken, verifyRole('Admin'), updateAdmin)
 
 
 // related to author management
-route.get('/', verifyToken, verifyRole('Admin'), getAuthors)
+route.get('/author', verifyToken, verifyRole('Admin'), getAuthors)
 
-route.delete('/', verifyToken, verifyRole('Admin'), softDelteAuthor)
+route.delete('/author', verifyToken, verifyRole('Admin'), softDelteAuthor)
 
 export default route;
