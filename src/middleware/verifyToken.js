@@ -1,5 +1,4 @@
 import constants from '../config/constants.js';
-import AppError from '../utils/appError.js';
 import jwt from 'jsonwebtoken';
 import responseHandler from '../utils/responseHandler.js';
 
@@ -9,7 +8,7 @@ const verifyToken = (req, res, next) => {
     if (!token)
         responseHandler(
             res,
-            resconstants.UNAUTHORIZED,
+            constants.UNAUTHORIZED,
             'fail',
             'Unauthorized access'
         );
@@ -22,7 +21,7 @@ const verifyToken = (req, res, next) => {
     if (!valid)
         responseHandler(
             res,
-            resconstants.UNAUTHORIZED,
+            constants.UNAUTHORIZED,
             'fail',
             'Unauthorized access'
         );

@@ -2,7 +2,7 @@ import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
 import responseHandler from '../utils/responseHandler.js';
-import { loginAuthorService, registerAuthorService } from "../services/author.service.js";
+import { getAuthorsService, loginAuthorService, registerAuthorService } from "../services/author.service.js";
 
 // register reader
 const registerAuthor = asyncHandler(async (req, res, next) => {
@@ -49,4 +49,21 @@ const loginAuthor = asyncHandler(async (req, res, next) => {
     });
 })
 
-export { registerAuthor, loginAuthor }
+// get authors
+const getAuthors = asyncHandler(async (req, res, next) => {
+
+    const query = req.query;
+
+    console.log(query)
+    if (!query)
+        return next(
+            new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+        );
+
+    const authors = await getAuthorsService(query);
+
+    responseHandler(res, constants.OK, 'success', 'Authors found', { authors });
+
+})
+
+export { registerAuthor, loginAuthor, getAuthors }

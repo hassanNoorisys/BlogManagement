@@ -107,9 +107,23 @@ const createAuthorService = async (data) => {
     );
 };
 
+// get authors service
+const getAdminSerivce = async (query) => {
+
+    const admin = await adminModel.findOne({ _id: query })
+        .select(['-adminPassword', '-createdAt', '-updatedAt', '-adminOtp']).lean()
+
+    console.log('admin service --> ', admin)
+
+    if (!admin) throw new AppError(constants.NO_CONTENT, 'No admin found')
+
+    return admin
+}
+
 export {
 
     registerAdminService,
     loginAdminService,
-    createAuthorService
+    createAuthorService,
+    getAdminSerivce
 }

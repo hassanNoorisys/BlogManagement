@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createAuthor, loginAdmin, registerAdmin, } from '../controllers/admin.controller.js';
+import { createAuthor, getAdmin, loginAdmin, registerAdmin, } from '../controllers/admin.controller.js';
 
 import verifyRole from '../middleware/verifyRole.js';
 import verifyToken from '../middleware/verifyToken.js';
@@ -12,10 +12,13 @@ const route = Router();
 route
     .post('/register', profileImageUpload.single('avatar'), registerAdmin)
     .post('/login', loginAdmin);
-    // .post('/verify-email', verifyEmail)
+// .post('/verify-email', verifyEmail)
 
 
 // admin realted routes
 route.post('/create-author', verifyToken, verifyRole('Admin'), createAuthor);
+
+route.get('/', verifyToken, verifyRole('Admin'), getAdmin)
+
 
 export default route;

@@ -1,5 +1,4 @@
 import constants from '../config/constants.js';
-import AppError from '../utils/appError.js';
 import responseHandler from '../utils/responseHandler.js';
 
 const verifyRole = (...allowdRoles) => {

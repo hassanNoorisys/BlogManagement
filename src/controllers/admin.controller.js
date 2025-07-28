@@ -1,7 +1,7 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
-import { createAuthorService, loginAdminService, registerAdminService } from '../services/admin.service.js';
+import { createAuthorService, getAdminSerivce, loginAdminService, registerAdminService } from '../services/admin.service.js';
 import responseHandler from '../utils/responseHandler.js';
 
 
@@ -65,4 +65,22 @@ const createAuthor = asyncHandler(async (req, res, next) => {
     responseHandler(res, constants.OK, 'success', 'The user is now an author');
 });
 
-export { registerAdmin, loginAdmin, createAuthor }
+// get admin
+const getAdmin = asyncHandler(async (req, res, next) => {
+
+    const id = req.user.id
+
+    console.log(req.user)
+
+    if (!id)
+        return next(
+            new AppError(constants.BAD_REQUEST, 'You are not registered ')
+        );
+
+    const admin = await getAdminSerivce(id);
+
+    responseHandler(res, constants.OK, 'success', 'Admin found', { admin });
+
+})
+
+export { registerAdmin, loginAdmin, createAuthor, getAdmin }
