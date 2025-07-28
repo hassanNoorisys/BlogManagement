@@ -207,58 +207,90 @@ const blogActionService = async (filter) => {
 
     if (!blog || !reader) throw new AppError(constants.BAD_REQUEST, 'User or blog does not exist')
 
-    // console.log('like blog service -->  ', blog, action)
+    const alreadyLiked = blog.likedBy.includes(userId);
+    const alreadyDisliked = blog.disLikedBy.includes(userId);
 
+    const updateOps = [];
     if (action === 'liked') {
+        if (alreadyLiked)
+            return
 
-        await Promise.all([
+        if (alreadyDisliked) {
+            updateOps.push(
+                blogModel.updateOne(
+                    { _id: blogId },
+                    {
+                        $pull: { disLikedBy: userId },
+                        $inc: { dislikeCount: -1 }
+                    }
+                )
+            );
+            updateOps.push(
+                readerModel.updateOne(
+                    { _id: userId },
+                    { $pull: { dislikedBlog: blogId } }
+                )
+            );
+        }
 
-            // update reader model 
-            readerModel.findByIdAndUpdate({ _id: userId },
-
-                {
-                    $pull: { dislikedBlog: blogId },
-                    $addToSet: { likedBlog: blogId }
-                }
-
-            ),
-
-            // update blog model based 
-            blogModel.findByIdAndUpdate({ _id: blogId },
-
+        // Add to likes
+        updateOps.push(
+            blogModel.updateOne(
+                { _id: blogId },
                 {
                     $addToSet: { likedBy: userId },
-                    $pull: { disLikedBy: userId },
                     $inc: { likeCount: 1 }
                 }
-            ),
-        ])
+            )
+        );
+        updateOps.push(
+            readerModel.updateOne(
+                { _id: userId },
+                { $addToSet: { likedBlog: blogId } }
+            )
+        );
 
-    } else {
+    } else if (action === 'disliked') {
+        if (alreadyDisliked)
+            return
 
-        await Promise.all([
+        if (alreadyLiked) {
+            updateOps.push(
+                blogModel.updateOne(
+                    { _id: blogId },
+                    {
+                        $pull: { likedBy: userId },
+                        $inc: { likeCount: -1 }
+                    }
+                )
+            );
+            updateOps.push(
+                readerModel.updateOne(
+                    { _id: userId },
+                    { $pull: { likedBlog: blogId } }
+                )
+            );
+        }
 
-            // update reader model based 
-            readerModel.findByIdAndUpdate({ _id: userId },
-
-                {
-                    $pull: { likedBlog: blogId },
-                    $addToSet: { dislikedBlog: blogId }
-                }
-            ),
-
-            // update blog model based 
-            blogModel.findByIdAndUpdate({ _id: blogId },
-
+        // Add to dislikes
+        updateOps.push(
+            blogModel.updateOne(
+                { _id: blogId },
                 {
                     $addToSet: { disLikedBy: userId },
-                    $pull: { likedBy: userId },
                     $inc: { dislikeCount: 1 }
                 }
-
-            ),
-        ])
+            )
+        );
+        updateOps.push(
+            readerModel.updateOne(
+                { _id: userId },
+                { $addToSet: { dislikedBlog: blogId } }
+            )
+        );
     }
+
+    await Promise.all(updateOps);
 }
 
 export { createBlogService, getBlogService, updateBlogService, blogActionService };

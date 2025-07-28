@@ -4,7 +4,8 @@ import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
 import constants from '../config/constants.js';
 import AppError from '../utils/appError.js';
-
+import readerModel from '../models/reader.model.js';
+import blogModel from '../models/blog.model.js';
 
 // create blog
 const createBlog = asyncHandler(async (req, res, next) => {
@@ -120,13 +121,17 @@ const likeOrDislike = asyncHandler(async (req, res, next) => {
 
     responseHandler(res, constants.OK, 'success', action)
 
-
 })
 
+// make blog favourite
+const makeFavourite = asyncHandler(async (req, res, next) => {
+
+})
 
 export {
     createBlog,
     getBlogs,
     updateBlog,
-    likeOrDislike
+    likeOrDislike,
+    makeFavourite
 };
