@@ -115,7 +115,7 @@ const likeOrDislike = asyncHandler(async (req, res, next) => {
 
     if (!['liked', 'disliked'].includes(action) || !blogId) next(new AppError(constants.BAD_REQUEST, 'invalid action'))
 
-    await blogActionService({ action, userId, blogId })
+    await blogActionService({ userId, blogId }, action)
 
     responseHandler(res, constants.OK, 'success', action)
 

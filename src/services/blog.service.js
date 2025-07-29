@@ -216,8 +216,12 @@ const blogActionService = async (filter, action) => {
     const alreadyLiked = blog.likedBy.includes(userId);
     const alreadyDisliked = blog.disLikedBy.includes(userId);
 
+    // console.log('like blog service --> ', alreadyLiked, alreadyDisliked)
+
     const updateOps = [];
     if (action === 'liked') {
+    console.log('like blog service --> ', alreadyLiked, alreadyDisliked)
+
         if (alreadyLiked)
             return
 
