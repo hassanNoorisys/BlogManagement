@@ -1,4 +1,4 @@
-import { addToFavouriteService, blogActionService, createBlogService, getBlogService, getFavouriteBlogsService, updateBlogService } from '../services/blog.service.js';
+import { addToFavouriteService, blogActionService, createBlogService, deleteBlogService, getBlogService, getFavouriteBlogsService, updateBlogService } from '../services/blog.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
@@ -151,11 +151,39 @@ const favouriteBlog = asyncHandler(async (req, res, next) => {
     responseHandler(res, constants.OK, 'success', 'Favourite Blogs', blogs)
 })
 
+// delete blog
+const deleteBlog = asyncHandler(async (req, res, next) => {
+
+    const role = req.user.role
+    const userId = req.user.id
+
+    const query = req.query
+
+    if (Object.keys(query).length === 0) return next(
+        new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    );
+
+    const filter = {
+
+        ...(role === 'Admin' ? { admin: userId } : { author: userId }),
+        ...(query.slug && { slug: query.slug }),
+        ...(query.id && { _id: query.id })
+    }
+
+    // console.log('delete blog --> ', filter, query)
+
+    const title = await deleteBlogService(filter)
+
+    responseHandler(res, constants.OK, 'success', 'Blog deleted successfully', title)
+
+
+})
 export {
     createBlog,
     getBlogs,
     updateBlog,
     likeOrDislike,
     addToFavourite,
-    favouriteBlog
+    favouriteBlog,
+    deleteBlog
 };

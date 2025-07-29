@@ -69,7 +69,9 @@ const deleteReaderService = async (filter) => {
 
     if (!user) throw new AppError(constants.NOT_FOUND, 'User is not present')
 
-    console.log('delete reader service --> ', user)
+    // console.log('delete reader service --> ', user)
+
+    // TODO: delete the likedBlog, favoritedBy in blog collection
 
     return { email: readerEmail, name: readerName }
 }

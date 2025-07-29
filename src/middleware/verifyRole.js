@@ -8,7 +8,6 @@ const verifyRole = (...allowdRoles) => {
         // console.log(req.user)
         if (!allowdRoles.includes(req.user.role))
 
-
             return responseHandler(
                 res,
                 constants.UNAUTHORIZED,

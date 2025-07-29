@@ -420,9 +420,24 @@ const getFavouriteBlogsService = async (query, userId) => {
     return blogs
 }
 
+// delete blog
+const deleteBlogService = async (filter) => {
+
+    const blog = await blogModel.findOneAndDelete(filter)
+
+    if (!blog) throw new AppError(constants.NOT_FOUND, 'Blog not found')
+
+    // console.log('delete blog service --> ', blog)
+
+    // TODO: delete id of favorite, liked, disliked blog from reader model
+
+    return blog.title
+}
+
 export {
     createBlogService,
     getBlogService, updateBlogService,
     blogActionService, addToFavouriteService,
-    getFavouriteBlogsService
+    getFavouriteBlogsService,
+    deleteBlogService
 };
