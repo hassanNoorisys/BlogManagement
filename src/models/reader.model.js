@@ -19,7 +19,6 @@ const readerSchema = new Schema(
         readerName: {
             type: String,
             required: true,
-            unique: true,
         },
 
         readerAvatar: {

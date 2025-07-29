@@ -1,7 +1,5 @@
 import multer from 'multer';
 import { fileURLToPath } from 'url';
-import AppError from '../utils/appError.js';
-import constants from '../config/constants.js';
 import path from 'path';
 
 const storage = multer.diskStorage({

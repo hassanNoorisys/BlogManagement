@@ -25,8 +25,9 @@ const registerReaderService = async (data) => {
     await sendEmail(
         EMAIL_USER,
         readerEmail,
-        'Email Verification',
-        `Your OTP for blog management is ${otp}`
+        'Your OTP for Email Verification',
+        otp,
+        readerName
     );
 
     // save user
