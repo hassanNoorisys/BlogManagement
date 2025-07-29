@@ -1,8 +1,7 @@
 import constants from '../config/constants.js';
 import adminModel from '../models/admin.model.js';
-// import userModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
-import sendEmail from '../utils/sendEmail.js';
+import  { sendOTPEmail } from '../utils/sendEmail.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 import authorModel from '../models/author.model.js'
@@ -25,12 +24,7 @@ const registerAdminService = async (data) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await sendEmail(
-        EMAIL_USER,
-        adminEmail,
-        'Email Verification',
-        `Your OTP for blog management is ${otp}`
-    );
+    await sendOTPEmail(EMAIL_USER, adminEmail, 'Your OTP for Email Verification', otp, adminName);
 
     // save user
     const newReader = new adminModel({ adminEmail, adminPassword, adminName, adminAvatar, readerOtp: otp, role: 'Admin' });

@@ -1,9 +1,9 @@
 import AppError from '../utils/appError.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import sendEmail from '../utils/sendEmail.js';
 import readerModel from '../models/reader.model.js';
 import constants from '../config/constants.js';
+import { sendOTPEmail } from '../utils/sendEmail.js';
 
 // register reader service
 const registerReaderService = async (data) => {
@@ -22,13 +22,7 @@ const registerReaderService = async (data) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await sendEmail(
-        EMAIL_USER,
-        readerEmail,
-        'Your OTP for Email Verification',
-        otp,
-        readerName
-    );
+    await sendOTPEmail(EMAIL_USER, readerEmail, 'Your OTP for Email Verification', otp, readerName);
 
     // save user
     const newReader = new readerModel({ readerEmail, readerPassword, readerName, readerAvatar, readerOtp: otp, role: 'Reader' });

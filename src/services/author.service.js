@@ -1,7 +1,7 @@
 import AppError from '../utils/appError.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import sendEmail from '../utils/sendEmail.js';
+import { sendWelcomeEmail } from '../utils/sendEmail.js';
 import constants from '../config/constants.js';
 import authorModel from '../models/author.model.js';
 
@@ -21,17 +21,10 @@ const registerAuthorService = async (data) => {
     // send otp by email
     const EMAIL_USER = process.env.EMAIL_USER;
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await sendEmail(
-        EMAIL_USER,
-        authorEmail,
-        'Email Verification',
-        `Your OTP for blog management is ${otp}`
-    );
+    await sendWelcomeEmail(EMAIL_USER, authorEmail, 'You’re now an Author! Start Blogging ✍️', authorName);
 
     // save user
-    const newReader = new authorModel({ authorEmail, authorPassword, authorName, authorAvatar, readerOtp: otp, role: 'Author', bio: 'A description about author' });
+    const newReader = new authorModel({ authorEmail, authorPassword, authorName, authorAvatar, role: 'Author', bio: 'A description about author' });
 
     await newReader.save();
 
