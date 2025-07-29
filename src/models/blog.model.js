@@ -46,6 +46,12 @@ const blogSchema = new Schema(
         disLikedBy: [{ type: Types.ObjectId, ref: 'reader' }],
 
         favouritedBy: [{ type: Types.ObjectId, ref: 'reader' }],
+
+        isActive: {
+
+            type: Boolean,
+            default: true
+        }
     },
     { timestamps: true }
 );

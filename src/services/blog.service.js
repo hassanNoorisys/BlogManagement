@@ -1,11 +1,9 @@
 import { Types } from 'mongoose';
 import constants from '../config/constants.js';
 import blogModel from '../models/blog.model.js';
-// import userModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
 import adminModel from '../models/admin.model.js'
 import authorModel from '../models/author.model.js'
-import fs from 'fs/promises'
 import readerModel from '../models/reader.model.js';
 
 const getBlogPipeline = [
@@ -79,59 +77,8 @@ const createBlogService = async (data) => {
 };
 
 // get blog service
-const getBlogService = async (data) => {
-    const {
-        title,
-        slug,
-        blogOwnerName,
-        id,
-
-        toYear,
-        toMonth,
-        toDay,
-
-        fromYear,
-        fromMonth,
-        fromDay,
-
-        page,
-        size
-    } = data;
-
-    const fy =
-        typeof fromYear !== 'undefined'
-            ? Number(fromYear)
-            : new Date().getFullYear();
-    const fm = typeof fromMonth !== 'undefined' ? Number(fromMonth) - 1 : 0;
-    const fd = typeof fromDay !== 'undefined' ? Number(fromDay) : 1;
-
-    const ty = typeof toYear !== 'undefined'
-        ? Number(toYear)
-        : new Date().getFullYear();
-
-    const tm = typeof toMonth !== 'undefined' ? Number(toMonth) - 1 : 0;
-    const td = typeof toDay !== 'undefined' ? Number(toDay) : 1;
-
-    const from = new Date(fy, fm, fd);
-    const to = new Date(ty, tm, td + 1);
-
-
-    const filter = {
-        ...(slug && { slug }),
-        ...(id && { _id: new Types.ObjectId(id) }),
-        ...(title && { title }),
-        ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
-            ? {
-                createdAt: {
-                    $gte: from,
-                    $lt: to,
-                },
-            }
-            : {}),
-    };
-    // console.log('feth blogs services--> ', filter)
-
-    const isUniqueQuery = id || slug
+const getBlogService = async ({ page, size, blogOwnerName, filter, isUnique }) => {
+  
     const blogs = await blogModel.aggregate([
         {
             $match: filter,
@@ -157,21 +104,21 @@ const getBlogService = async (data) => {
                 slug: 1,
                 content: 1,
                 createdAt: 1,
+                isActive: 1,
                 'user.email': 1,
                 'user.name': 1,
                 'user.avatar': 1,
                 'user.bio': 1,
                 'user.role': 1,
+                'user._id': 1
             },
         },
-        { $skip: !isUniqueQuery ? ((page - 1) * size || 0) : 0 },
-        { $limit: Number(!isUniqueQuery ? size || 5 : 1) },
+        { $skip: !isUnique ? ((page - 1) * size || 0) : 0 },
+        { $limit: Number(!isUnique ? size || 5 : 1) },
     ]);
 
-
-
     if (!blogs || blogs.length < 1)
-        throw new AppError(constants.NO_CONTENT, 'Blog not found');
+        throw new AppError(constants.NOT_FOUND, 'Blog not found');
 
     // console.log('get blog services -->', blogs)
     return blogs;
@@ -220,7 +167,7 @@ const blogActionService = async (filter, action) => {
 
     const updateOps = [];
     if (action === 'liked') {
-    console.log('like blog service --> ', alreadyLiked, alreadyDisliked)
+        console.log('like blog service --> ', alreadyLiked, alreadyDisliked)
 
         if (alreadyLiked)
             return
@@ -438,10 +385,122 @@ const deleteBlogService = async (filter) => {
     return blog.title
 }
 
+// maek active or inActive
+const blogStateService = async () => {
+
+
+}
+
+// get blog on different state
+const getBlogOnStateService = async (data) => {
+
+    const {
+        title,
+        slug,
+        blogOwnerName,
+        id,
+
+        toYear,
+        toMonth,
+        toDay,
+
+        fromYear,
+        fromMonth,
+        fromDay,
+
+        page,
+        size
+    } = data;
+
+    const fy =
+        typeof fromYear !== 'undefined'
+            ? Number(fromYear)
+            : new Date().getFullYear();
+    const fm = typeof fromMonth !== 'undefined' ? Number(fromMonth) - 1 : 0;
+    const fd = typeof fromDay !== 'undefined' ? Number(fromDay) : 1;
+
+    const ty = typeof toYear !== 'undefined'
+        ? Number(toYear)
+        : new Date().getFullYear();
+
+    const tm = typeof toMonth !== 'undefined' ? Number(toMonth) - 1 : 0;
+    const td = typeof toDay !== 'undefined' ? Number(toDay) : 1;
+
+    const from = new Date(fy, fm, fd);
+    const to = new Date(ty, tm, td + 1);
+
+
+    const filter = {
+
+        isActive: true,
+        ...(slug && { slug }),
+        ...(id && { _id: new Types.ObjectId(id) }),
+        ...(title && { title }),
+        ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
+            ? {
+                createdAt: {
+                    $gte: from,
+                    $lt: to,
+                },
+            }
+            : {}),
+    };
+    // console.log('feth blogs services--> ', filter)
+
+    const isUniqueQuery = id || slug
+    const blogs = await blogModel.aggregate([
+        {
+            $match: filter,
+        },
+
+        ...getBlogPipeline,
+
+        ...(blogOwnerName
+            ? [
+                {
+                    $match: {
+                        'user.name': {
+                            $regex: blogOwnerName,
+                            $options: 'i',
+                        },
+                    },
+                },
+            ]
+            : []),
+        {
+            $project: {
+                title: 1,
+                slug: 1,
+                content: 1,
+                createdAt: 1,
+                isActive: 1,
+                'user.email': 1,
+                'user.name': 1,
+                'user.avatar': 1,
+                'user.bio': 1,
+                'user.role': 1,
+                'user._id': 1
+            },
+        },
+        { $skip: !isUniqueQuery ? ((page - 1) * size || 0) : 0 },
+        { $limit: Number(!isUniqueQuery ? size || 5 : 1) },
+    ]);
+
+
+
+    if (!blogs || blogs.length < 1)
+        throw new AppError(constants.NOT_FOUND, 'Blog not found');
+
+    // console.log('get blog services -->', blogs)
+    return blogs;
+}
+
 export {
     createBlogService,
     getBlogService, updateBlogService,
     blogActionService, addToFavouriteService,
     getFavouriteBlogsService,
-    deleteBlogService
+    deleteBlogService,
+    blogStateService,
+    getBlogOnStateService
 };

@@ -1,4 +1,4 @@
-import { addToFavouriteService, blogActionService, createBlogService, deleteBlogService, getBlogService, getFavouriteBlogsService, updateBlogService } from '../services/blog.service.js';
+import { addToFavouriteService, blogActionService, createBlogService, deleteBlogService, getBlogOnStateService, getBlogService, getFavouriteBlogsService, updateBlogService } from '../services/blog.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
@@ -55,13 +55,69 @@ const createBlog = asyncHandler(async (req, res, next) => {
 
 // get blogs
 const getBlogs = asyncHandler(async (req, res, next) => {
+
     const query = req.query;
     if (!query)
         return next(
             new AppError(constants.BAD_REQUEST, 'All fields are required !!')
         );
 
-    const blogs = await getBlogService(query);
+    const {
+        title,
+        slug,
+        blogOwnerName,
+        id,
+
+        toYear,
+        toMonth,
+        toDay,
+
+        fromYear,
+        fromMonth,
+        fromDay,
+
+        page,
+        size
+    } = query;
+
+    const fy =
+        typeof fromYear !== 'undefined'
+            ? Number(fromYear)
+            : new Date().getFullYear();
+    const fm = typeof fromMonth !== 'undefined' ? Number(fromMonth) - 1 : 0;
+    const fd = typeof fromDay !== 'undefined' ? Number(fromDay) : 1;
+
+    const ty = typeof toYear !== 'undefined'
+        ? Number(toYear)
+        : new Date().getFullYear();
+
+    const tm = typeof toMonth !== 'undefined' ? Number(toMonth) - 1 : 0;
+    const td = typeof toDay !== 'undefined' ? Number(toDay) : 1;
+
+    const from = new Date(fy, fm, fd);
+    const to = new Date(ty, tm, td + 1);
+
+    const filter = {
+
+        isActive: true,
+        ...(slug && { slug }),
+        ...(id && { _id: new Types.ObjectId(id) }),
+        ...(title && { title }),
+        ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
+            ? {
+                createdAt: {
+                    $gte: from,
+                    $lt: to,
+                },
+            }
+            : {}),
+    };
+
+    const isUnique = id || slug
+    
+    // console.log('feth blogs --> ', { page, size, blogOwnerName, filter, isUnique })
+    
+    const blogs = await getBlogService({ page, size, blogOwnerName, filter, isUnique })
 
     responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
 });
@@ -178,6 +234,32 @@ const deleteBlog = asyncHandler(async (req, res, next) => {
 
 
 })
+
+// blog active or inActive
+const blogState = asyncHandler(async (req, res, next) => {
+
+    const userId = req.user.id
+    const role = req.user.role
+
+    const blogId = req.params.id
+
+    if (!blogId) return next(
+        new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    );
+
+
+})
+
+// get active or inactive blog
+const getBlogOnState = asyncHandler(async (req, res, next) => {
+
+    const role = req.user.role
+    const userId = req.user.id
+
+    await getBlogOnStateService()
+
+})
+
 export {
     createBlog,
     getBlogs,
@@ -185,5 +267,7 @@ export {
     likeOrDislike,
     addToFavourite,
     favouriteBlog,
-    deleteBlog
+    deleteBlog,
+    blogState,
+    getBlogOnState
 };
