@@ -78,7 +78,7 @@ const createBlogService = async (data) => {
 
 // get blog service
 const getBlogService = async ({ page, size, blogOwnerName, filter, isUnique }) => {
-  
+
     const blogs = await blogModel.aggregate([
         {
             $match: filter,
@@ -386,68 +386,14 @@ const deleteBlogService = async (filter) => {
 }
 
 // maek active or inActive
-const blogStateService = async () => {
+const setBlogStateService = async (filter, state) => {
 
-
+    const blog = await blogModel.findOneAndUpdate(filter, { isActive: state === 'active' ? true : false })
 }
 
 // get blog on different state
-const getBlogOnStateService = async (data) => {
+const getBlogOnStateService = async ({ page, size, blogOwnerName, filter, isUnique }) => {
 
-    const {
-        title,
-        slug,
-        blogOwnerName,
-        id,
-
-        toYear,
-        toMonth,
-        toDay,
-
-        fromYear,
-        fromMonth,
-        fromDay,
-
-        page,
-        size
-    } = data;
-
-    const fy =
-        typeof fromYear !== 'undefined'
-            ? Number(fromYear)
-            : new Date().getFullYear();
-    const fm = typeof fromMonth !== 'undefined' ? Number(fromMonth) - 1 : 0;
-    const fd = typeof fromDay !== 'undefined' ? Number(fromDay) : 1;
-
-    const ty = typeof toYear !== 'undefined'
-        ? Number(toYear)
-        : new Date().getFullYear();
-
-    const tm = typeof toMonth !== 'undefined' ? Number(toMonth) - 1 : 0;
-    const td = typeof toDay !== 'undefined' ? Number(toDay) : 1;
-
-    const from = new Date(fy, fm, fd);
-    const to = new Date(ty, tm, td + 1);
-
-
-    const filter = {
-
-        isActive: true,
-        ...(slug && { slug }),
-        ...(id && { _id: new Types.ObjectId(id) }),
-        ...(title && { title }),
-        ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
-            ? {
-                createdAt: {
-                    $gte: from,
-                    $lt: to,
-                },
-            }
-            : {}),
-    };
-    // console.log('feth blogs services--> ', filter)
-
-    const isUniqueQuery = id || slug
     const blogs = await blogModel.aggregate([
         {
             $match: filter,
@@ -482,11 +428,9 @@ const getBlogOnStateService = async (data) => {
                 'user._id': 1
             },
         },
-        { $skip: !isUniqueQuery ? ((page - 1) * size || 0) : 0 },
-        { $limit: Number(!isUniqueQuery ? size || 5 : 1) },
+        { $skip: !isUnique ? ((page - 1) * size || 0) : 0 },
+        { $limit: Number(!isUnique ? size || 5 : 1) },
     ]);
-
-
 
     if (!blogs || blogs.length < 1)
         throw new AppError(constants.NOT_FOUND, 'Blog not found');
@@ -501,6 +445,6 @@ export {
     blogActionService, addToFavouriteService,
     getFavouriteBlogsService,
     deleteBlogService,
-    blogStateService,
+    setBlogStateService,
     getBlogOnStateService
 };

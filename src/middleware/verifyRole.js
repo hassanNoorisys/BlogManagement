@@ -4,8 +4,6 @@ import responseHandler from '../utils/responseHandler.js';
 const verifyRole = (...allowdRoles) => {
     return (req, res, next) => {
 
-
-        // console.log(req.user)
         if (!allowdRoles.includes(req.user.role))
 
             return responseHandler(
