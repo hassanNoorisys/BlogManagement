@@ -221,7 +221,7 @@ const deleteBlog = asyncHandler(async (req, res, next) => {
 
     const filter = {
 
-        ...(role === 'Admin' ? { admin: userId } : { author: userId }),
+        ...(role === 'author' ? { author: userId } : {}),
         ...(query.slug && { slug: query.slug }),
         ...(query.id && { _id: query.id })
     }
@@ -247,18 +247,12 @@ const setBlogState = asyncHandler(async (req, res, next) => {
         new AppError(constants.BAD_REQUEST, 'All fields are required !!')
     );
 
-    let filter;
-    if (role === 'Admin') {
-        filter = {
+    const filter = {
 
-            _id: blogId,
-        }
-    } else {
-        filter = {
-            _id: blogId,
-            author: userId
-        }
-    }
+        ...(role === 'Author' ? { author: userId } : {}),
+        _id: blogId
+    };
+
     await setBlogStateService(filter, state)
 
     responseHandler(res, constants.OK, 'success', `Blog state is set to ${state}`)
