@@ -62,9 +62,21 @@ const loginReaderService = async (data) => {
     return token;
 };
 
+// delete reader
+const deleteReaderService = async (filter) => {
+
+    const user = await readerModel.findOneAndDelete(filter)
+
+    if (!user) throw new AppError(constants.NOT_FOUND, 'User is not present')
+
+    console.log('delete reader service --> ', user)
+
+    return { email: readerEmail, name: readerName }
+}
 
 export {
 
     registerReaderService,
-    loginReaderService
+    loginReaderService,
+    deleteReaderService
 }

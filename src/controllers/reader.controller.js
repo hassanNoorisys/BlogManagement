@@ -1,8 +1,9 @@
-import { loginReaderService, registerReaderService } from "../services/reader.service.js";
+import { deleteReaderService, loginReaderService, registerReaderService } from "../services/reader.service.js";
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
 import responseHandler from '../utils/responseHandler.js';
+import { Types } from "mongoose";
 
 // register reader
 const registerReader = asyncHandler(async (req, res, next) => {
@@ -49,4 +50,23 @@ const loginReader = asyncHandler(async (req, res, next) => {
     });
 })
 
-export { registerReader, loginReader }
+// delete reader
+const deleteReader = asyncHandler(async (req, res, next) => {
+
+    const query = req.query
+
+    if (!query) return next(
+        new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    );
+
+    const filter = {
+
+        ...(query.id && { _id: new Types.ObjectId(query.id) }),
+        ...(query.email && { readerEmail: query.email })
+    }
+    const { email, name } = await deleteReaderService(filter)
+
+    responseHandler(res, constants.OK, 'success', 'User deleted successfully', { email, name })
+})
+
+export { registerReader, loginReader, deleteReader }
