@@ -35,7 +35,6 @@ const createTransport = (level) => {
 
 const transportList = [];
 
-console.log('logger --> ', process.env.NODE_ENV)
 if (process.env.NODE_ENV === 'development') {
     transportList.push(new transports.Console());
 } else {

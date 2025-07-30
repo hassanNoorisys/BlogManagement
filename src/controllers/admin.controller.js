@@ -34,11 +34,6 @@ const registerAdmin = asyncHandler(async (req, res, next) => {
         adminAvatar,
     });
 
-    logger.info(`Admin Registered with email ${adminEmail} `, {
-        method: req.method,
-        url: req.originalUrl,
-        statusCode: res.statusCode,
-    })
     responseHandler(
         res,
         constants.OK,
@@ -46,6 +41,12 @@ const registerAdmin = asyncHandler(async (req, res, next) => {
         'OTP is sent to your email',
         data
     );
+
+    logger.info(`Admin Registered with email ${adminEmail} `, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // login admin
@@ -59,17 +60,18 @@ const loginAdmin = asyncHandler(async (req, res, next) => {
         );
 
     const token = await loginAdminService({ adminEmail, adminPassword });
-    
+
+    responseHandler(res, constants.OK, 'success', 'Login Successfull', {
+        adminEmail,
+        token,
+    });
+
     logger.info(`Admin with email ${adminEmail} logged in`, {
         method: req.method,
         url: req.originalUrl,
         statusCode: res.statusCode,
     })
 
-    responseHandler(res, constants.OK, 'success', 'Login Successfull', {
-        adminEmail,
-        token,
-    });
 });
 
 // create author
@@ -84,6 +86,12 @@ const createAuthor = asyncHandler(async (req, res, next) => {
     await createAuthorService({ readerEmail });
 
     responseHandler(res, constants.OK, 'success', 'The user is now an author');
+
+    logger.info(`Admin created author with email ${readerEmail}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // get admin
@@ -100,6 +108,12 @@ const getAdmin = asyncHandler(async (req, res, next) => {
     const admin = await getAdminSerivce(id);
 
     responseHandler(res, constants.OK, 'success', 'Admin found', { admin });
+
+    logger.info(`Get admin profile of id ${id}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // update admin
@@ -122,6 +136,12 @@ const updateAdmin = asyncHandler(async (req, res, next) => {
         'success',
         'Profile updated successfully'
     );
+
+    logger.info(`Update admin profile of id: ${filter}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // related to management of authors
@@ -139,6 +159,12 @@ const getAuthors = asyncHandler(async (req, res, next) => {
     const authors = await getAuthorsService(query);
 
     responseHandler(res, constants.OK, 'success', 'Authors found', { authors });
+
+    logger.info(`Get list of authors using ${query}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // soft delete author
@@ -163,6 +189,12 @@ const softDelteAuthor = asyncHandler(async (req, res, next) => {
         'Author deleted successfully',
         deletedAuthor
     );
+
+    logger.info(`Dlete author of ${query}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 export {

@@ -56,11 +56,6 @@ const createBlog = asyncHandler(async (req, res, next) => {
         role,
     });
 
-    logger.info(`Blog created by userId ${userId}`, {
-        method: req.method,
-        url: req.originalUrl,
-        statusCode: res.statusCode,
-    })
     responseHandler(
         res,
         constants.CREATED,
@@ -68,6 +63,12 @@ const createBlog = asyncHandler(async (req, res, next) => {
         `New Blog created for ${newBlogTitle}`,
         { newBlogTitle }
     );
+
+    logger.info(`Blog created by userId ${userId}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // get blogs
@@ -141,8 +142,13 @@ const getBlogs = asyncHandler(async (req, res, next) => {
         isUnique,
     });
 
-    logger.http('Success ...', formatHTTPLog(req, res))
-    responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
+    responseHandler(res, constants.OK, 'success', 'Blogs found', blogs);
+
+    logger.info(`Get list of blogs using ${JSON.stringify({ blogs })}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // update blog
@@ -187,6 +193,12 @@ const updateBlog = asyncHandler(async (req, res, next) => {
     responseHandler(res, constants.OK, 'success', 'Blog updated successfully', {
         title: updatedBlogTitle,
     });
+
+    logger.info(`Update blog having id  ${blogId}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // like or dislike blog
@@ -203,6 +215,13 @@ const likeOrDislike = asyncHandler(async (req, res, next) => {
     await blogActionService({ userId, blogId }, action);
 
     responseHandler(res, constants.OK, 'success', action);
+
+    logger.info(`Like or dislie blog of id: ${blogId}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
+
 });
 
 // make blog favourite
@@ -218,6 +237,12 @@ const addToFavourite = asyncHandler(async (req, res, next) => {
     await addToFavouriteService(userId, blogId);
 
     responseHandler(res, constants.OK, 'success', 'Added to Favourites');
+
+    logger.info(`Add blog id: ${blogId} to favorite list`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // get favourtite blog
@@ -232,6 +257,13 @@ const favouriteBlog = asyncHandler(async (req, res, next) => {
     const blogs = await getFavouriteBlogsService(query, userId);
 
     responseHandler(res, constants.OK, 'success', 'Favourite Blogs', blogs);
+
+    logger.info(`Get lisy favorite blogs`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
+
 });
 
 // delete blog
@@ -263,6 +295,12 @@ const deleteBlog = asyncHandler(async (req, res, next) => {
         'Blog deleted successfully',
         title
     );
+
+    logger.info(`Delete blog using filter: ${filter}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // set blog active or inActive
@@ -290,6 +328,12 @@ const setBlogState = asyncHandler(async (req, res, next) => {
         'success',
         `Blog state is set to ${state}`
     );
+
+    logger.info(`Set Blog state to ${state} using filter: ${filter}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // get active or inactive blog
@@ -364,6 +408,12 @@ const getBlogOnState = asyncHandler(async (req, res, next) => {
     });
 
     responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
+    
+    logger.info(`Get list of active or inactive blog using filter: ${filter}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 export {

@@ -87,7 +87,7 @@ const createAuthorService = async (data) => {
     if (author && author.role === 'Author')
         throw new AppError(constants.CONFLICT, 'User is already an Author');
 
-    if (!reader) throw new AppError('User is not registed');
+    if (!reader) throw new AppError(constants.CONFLICT, 'User is not registed');
 
     const newAuthor = new authorModel({
         authorEmail: readerEmail,

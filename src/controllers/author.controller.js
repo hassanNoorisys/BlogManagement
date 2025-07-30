@@ -6,6 +6,7 @@ import {
     loginAuthorService,
     registerAuthorService,
 } from '../services/author.service.js';
+import logger from '../config/logger.js'
 
 // register reader
 const registerAuthor = asyncHandler(async (req, res, next) => {
@@ -35,6 +36,12 @@ const registerAuthor = asyncHandler(async (req, res, next) => {
         'OTP is sent to your email',
         data
     );
+
+    logger.info(`Auhtor registered with email: ${authorEmail}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 // login reader
@@ -53,6 +60,12 @@ const loginAuthor = asyncHandler(async (req, res, next) => {
         authorEmail,
         token,
     });
+
+    logger.info(`Auhtor logged in with email: ${authorEmail}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 });
 
 export { registerAuthor, loginAuthor };
