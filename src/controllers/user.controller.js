@@ -11,7 +11,6 @@ import responseHandler from '../utils/responseHandler.js';
 
 // registe user
 const registerUser = asyncHandler(async (req, res, next) => {
-
     const { name, email, password } = req.body;
 
     if (!name || !email || !password)

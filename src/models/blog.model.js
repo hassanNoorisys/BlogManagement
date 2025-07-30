@@ -48,10 +48,9 @@ const blogSchema = new Schema(
         favouritedBy: [{ type: Types.ObjectId, ref: 'reader' }],
 
         isActive: {
-
             type: Boolean,
-            default: true
-        }
+            default: true,
+        },
     },
     { timestamps: true }
 );

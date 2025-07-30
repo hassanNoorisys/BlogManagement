@@ -5,7 +5,6 @@ import { sendWelcomeEmail } from '../utils/sendEmail.js';
 import constants from '../config/constants.js';
 import authorModel from '../models/author.model.js';
 
-
 // register author service
 const registerAuthorService = async (data) => {
     const { authorEmail, authorPassword, authorName, authorAvatar } = data;
@@ -21,10 +20,22 @@ const registerAuthorService = async (data) => {
     // send otp by email
     const EMAIL_USER = process.env.EMAIL_USER;
 
-    await sendWelcomeEmail(EMAIL_USER, authorEmail, 'You’re now an Author! Start Blogging ✍️', authorName);
+    await sendWelcomeEmail(
+        EMAIL_USER,
+        authorEmail,
+        'You’re now an Author! Start Blogging ✍️',
+        authorName
+    );
 
     // save user
-    const newReader = new authorModel({ authorEmail, authorPassword, authorName, authorAvatar, role: 'Author', bio: 'A description about author' });
+    const newReader = new authorModel({
+        authorEmail,
+        authorPassword,
+        authorName,
+        authorAvatar,
+        role: 'Author',
+        bio: 'A description about author',
+    });
 
     await newReader.save();
 
@@ -40,7 +51,10 @@ const loginAuthorService = async (data) => {
     if (!existingUser)
         throw new AppError(constants.NOT_FOUND, 'User is not present');
 
-    const valid = await bcrypt.compare(authorPassword, existingUser.authorPassword);
+    const valid = await bcrypt.compare(
+        authorPassword,
+        existingUser.authorPassword
+    );
     if (!valid)
         throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
 
@@ -56,8 +70,4 @@ const loginAuthorService = async (data) => {
     return token;
 };
 
-export {
-
-    registerAuthorService,
-    loginAuthorService,
-}
+export { registerAuthorService, loginAuthorService };

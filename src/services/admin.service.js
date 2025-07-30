@@ -1,11 +1,11 @@
 import constants from '../config/constants.js';
 import adminModel from '../models/admin.model.js';
 import AppError from '../utils/appError.js';
-import  { sendOTPEmail } from '../utils/sendEmail.js';
+import { sendOTPEmail } from '../utils/sendEmail.js';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken'
-import authorModel from '../models/author.model.js'
-import readerModel from '../models/reader.model.js'
+import jwt from 'jsonwebtoken';
+import authorModel from '../models/author.model.js';
+import readerModel from '../models/reader.model.js';
 
 // register admin service
 const registerAdminService = async (data) => {
@@ -24,10 +24,23 @@ const registerAdminService = async (data) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await sendOTPEmail(EMAIL_USER, adminEmail, 'Your OTP for Email Verification', otp, adminName);
+    await sendOTPEmail(
+        EMAIL_USER,
+        adminEmail,
+        'Your OTP for Email Verification',
+        otp,
+        adminName
+    );
 
     // save user
-    const newReader = new adminModel({ adminEmail, adminPassword, adminName, adminAvatar, readerOtp: otp, role: 'Admin' });
+    const newReader = new adminModel({
+        adminEmail,
+        adminPassword,
+        adminName,
+        adminAvatar,
+        readerOtp: otp,
+        role: 'Admin',
+    });
 
     await newReader.save();
 
@@ -43,7 +56,10 @@ const loginAdminService = async (data) => {
     if (!existingUser)
         throw new AppError(constants.NOT_FOUND, 'User is not present');
 
-    const valid = await bcrypt.compare(adminPassword, existingUser.adminPassword);
+    const valid = await bcrypt.compare(
+        adminPassword,
+        existingUser.adminPassword
+    );
     if (!valid)
         throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
 
@@ -64,27 +80,26 @@ const createAuthorService = async (data) => {
     const { readerEmail } = data;
 
     const [author, reader] = await Promise.all([
-
         authorModel.findOne({ authorEmail: readerEmail }),
-        readerModel.findOne({ readerEmail })
-    ])
+        readerModel.findOne({ readerEmail }),
+    ]);
 
     if (author && author.role === 'Author')
         throw new AppError(constants.CONFLICT, 'User is already an Author');
 
-    if (!reader) throw new AppError('User is not registed')
+    if (!reader) throw new AppError('User is not registed');
 
     const newAuthor = new authorModel({
         authorEmail: readerEmail,
         authorPassword: reader.readerPassword,
         authorName: reader.readerName,
         authorAvatar: reader.readerAvatar,
-        role: 'Author'
-    })
+        role: 'Author',
+    });
 
-    await newAuthor.save()
+    await newAuthor.save();
 
-    await reader.deleteOne({ readerEmail })
+    await reader.deleteOne({ readerEmail });
 
     // console.log('create author service --> ', reader, author)
 
@@ -103,73 +118,76 @@ const createAuthorService = async (data) => {
 
 // get admin service
 const getAdminSerivce = async (query) => {
-
-    const admin = await adminModel.findOne({ _id: query })
-        .select(['-adminPassword', '-createdAt', '-updatedAt', '-adminOtp']).lean()
+    const admin = await adminModel
+        .findOne({ _id: query })
+        .select(['-adminPassword', '-createdAt', '-updatedAt', '-adminOtp'])
+        .lean();
 
     // console.log('admin service --> ', admin)
 
-    if (!admin) throw new AppError(constants.NO_CONTENT, 'No admin found')
+    if (!admin) throw new AppError(constants.NO_CONTENT, 'No admin found');
 
-    return admin
-}
+    return admin;
+};
 
 // update admin service
 const updateAdminService = async (filter, dataTobeUpdated) => {
+    const updated = await adminModel.findByIdAndUpdate(filter, dataTobeUpdated);
 
-    const updated = await adminModel.findByIdAndUpdate(filter, dataTobeUpdated)
-
-    console.log('update admin service -->', updated)
-}
+    console.log('update admin service -->', updated);
+};
 
 // get authors service
 const getAuthorsService = async (query) => {
-
     const filter = {
-
         ...(query.name && { authorName: query.name }),
         ...(query.email && { authorEmail: query.email }),
         ...(query.id && { _id: query.id }),
-        ...(query.inactive && { isDeleted: query.inactive })
-    }
+        ...(query.inactive && { isDeleted: query.inactive }),
+    };
 
-    const { page, size } = query
+    const { page, size } = query;
 
-    const isUnique = query.id || query.name || query.email
+    const isUnique = query.id || query.name || query.email;
 
-    const authors = await authorModel.find(filter)
+    const authors = await authorModel
+        .find(filter)
         .select(['-password', '-createdAt', '-updatedAt', '-authorOtp'])
 
         .skip(!isUnique ? (page - 1) * size || 0 : 0)
         .limit(!isUnique ? size || 5 : 0)
 
-        .lean()
+        .lean();
 
-    console.log('author service --> ', authors)
+    console.log('author service --> ', authors);
 
-    if (!authors || authors.length < 1) throw new AppError(constants.NO_CONTENT, 'No auhtors found')
+    if (!authors || authors.length < 1)
+        throw new AppError(constants.NO_CONTENT, 'No auhtors found');
 
-    return authors
-}
+    return authors;
+};
 
 // soft delete author
 const softDeleteAuthorService = async (filter) => {
+    const data = await authorModel
+        .findOneAndUpdate(
+            filter,
+            { isDeleted: true, deletedAt: Date.now() },
+            { new: true }
+        )
+        .select(['authorEmail', 'authorName']);
 
-    const data = await authorModel.findOneAndUpdate(filter, { isDeleted: true, deletedAt: Date.now() }, { new: true }
-    ).select(['authorEmail', 'authorName'])
+    console.log('delete author service --> ', filter, data);
 
-    console.log('delete author service --> ', filter, data)
-
-    return data
-}
+    return data;
+};
 
 export {
-
     registerAdminService,
     loginAdminService,
     createAuthorService,
     getAdminSerivce,
     updateAdminService,
     softDeleteAuthorService,
-    getAuthorsService
-}
+    getAuthorsService,
+};

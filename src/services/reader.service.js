@@ -22,10 +22,23 @@ const registerReaderService = async (data) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await sendOTPEmail(EMAIL_USER, readerEmail, 'Your OTP for Email Verification', otp, readerName);
+    await sendOTPEmail(
+        EMAIL_USER,
+        readerEmail,
+        'Your OTP for Email Verification',
+        otp,
+        readerName
+    );
 
     // save user
-    const newReader = new readerModel({ readerEmail, readerPassword, readerName, readerAvatar, readerOtp: otp, role: 'Reader' });
+    const newReader = new readerModel({
+        readerEmail,
+        readerPassword,
+        readerName,
+        readerAvatar,
+        readerOtp: otp,
+        role: 'Reader',
+    });
 
     await newReader.save();
 
@@ -41,7 +54,10 @@ const loginReaderService = async (data) => {
     if (!existingUser)
         throw new AppError(constants.NOT_FOUND, 'User is not present');
 
-    const valid = await bcrypt.compare(readerPassword, existingUser.readerPassword);
+    const valid = await bcrypt.compare(
+        readerPassword,
+        existingUser.readerPassword
+    );
     if (!valid)
         throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
 
@@ -59,21 +75,15 @@ const loginReaderService = async (data) => {
 
 // delete reader
 const deleteReaderService = async (filter) => {
+    const user = await readerModel.findOneAndDelete(filter);
 
-    const user = await readerModel.findOneAndDelete(filter)
-
-    if (!user) throw new AppError(constants.NOT_FOUND, 'User is not present')
+    if (!user) throw new AppError(constants.NOT_FOUND, 'User is not present');
 
     // console.log('delete reader service --> ', user)
 
     // TODO: delete the likedBlog, favoritedBy in blog collection
 
-    return { email: readerEmail, name: readerName }
-}
+    return { email: readerEmail, name: readerName };
+};
 
-export {
-
-    registerReaderService,
-    loginReaderService,
-    deleteReaderService
-}
+export { registerReaderService, loginReaderService, deleteReaderService };

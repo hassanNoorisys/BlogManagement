@@ -2,7 +2,6 @@ import { model, Schema, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const authorSchema = new Schema(
-
     {
         authorEmail: {
             type: String,
@@ -34,7 +33,7 @@ const authorSchema = new Schema(
 
         isDeleted: {
             type: Boolean,
-            default: false
+            default: false,
         },
 
         deletedAt: Date,
@@ -48,7 +47,6 @@ const authorSchema = new Schema(
     { timestamps: true }
 );
 
-
 authorSchema.pre('save', async function (next) {
     if (this.isModified('authorPassword'))
         this.authorPassword = await bcrypt.hash(this.authorPassword, 10);
@@ -56,4 +54,4 @@ authorSchema.pre('save', async function (next) {
     next();
 });
 
-export default model('Author', authorSchema); 
+export default model('Author', authorSchema);

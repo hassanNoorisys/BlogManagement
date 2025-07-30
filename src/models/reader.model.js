@@ -33,35 +33,30 @@ const readerSchema = new Schema(
 
         // verfied: { type: Boolean, default: false }
 
-
         favouriteBlog: [
-
             {
                 type: Types.ObjectId,
                 ref: 'blog',
-                required: true
-            }
+                required: true,
+            },
         ],
 
         likedBlog: [
-
             {
                 type: Types.ObjectId,
                 ref: 'blog',
-                required: true
-            }
+                required: true,
+            },
         ],
 
         dislikedBlog: [
-
             {
                 type: Types.ObjectId,
                 ref: 'blog',
-                required: true
-            }
-        ]
+                required: true,
+            },
+        ],
     },
-
 
     { timestamps: true }
 );
@@ -73,4 +68,4 @@ readerSchema.pre('save', async function (next) {
     next();
 });
 
-export default model('Reader', readerSchema)
+export default model('Reader', readerSchema);

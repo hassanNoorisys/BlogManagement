@@ -2,11 +2,13 @@ import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
 import responseHandler from '../utils/responseHandler.js';
-import { loginAuthorService, registerAuthorService } from "../services/author.service.js";
+import {
+    loginAuthorService,
+    registerAuthorService,
+} from '../services/author.service.js';
 
 // register reader
 const registerAuthor = asyncHandler(async (req, res, next) => {
-
     const { authorEmail, authorPassword, authorName } = req.body;
 
     // console.log('reader --> ', req.body)
@@ -19,7 +21,12 @@ const registerAuthor = asyncHandler(async (req, res, next) => {
     // handle image url
     const authorAvatar = req.file.filename;
 
-    const data = await registerAuthorService({ authorEmail, authorPassword, authorName, authorAvatar });
+    const data = await registerAuthorService({
+        authorEmail,
+        authorPassword,
+        authorName,
+        authorAvatar,
+    });
 
     responseHandler(
         res,
@@ -32,7 +39,6 @@ const registerAuthor = asyncHandler(async (req, res, next) => {
 
 // login reader
 const loginAuthor = asyncHandler(async (req, res, next) => {
-
     const { authorEmail, authorPassword } = req.body;
 
     console.log('login --> ', authorEmail, authorPassword);
@@ -47,7 +53,6 @@ const loginAuthor = asyncHandler(async (req, res, next) => {
         authorEmail,
         token,
     });
-})
+});
 
-
-export { registerAuthor, loginAuthor }
+export { registerAuthor, loginAuthor };
