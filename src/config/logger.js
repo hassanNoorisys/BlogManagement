@@ -3,6 +3,7 @@ import 'winston-daily-rotate-file';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import 'winston-mongodb';
 
 const { combine, timestamp, printf } = format;
 
@@ -32,8 +33,17 @@ const createTransport = (level) => {
     });
 };
 
+const transportList = [
 
-const transportList = [];
+    // Use this to store the logs in mongodb
+    // new transports.MongoDB({
+    //     db: process.env.DB_URL,
+    //     collection: 'logs',
+    //     tryReconnect: true,
+
+    //     capped: true,
+    // }),
+];
 
 if (process.env.NODE_ENV === 'development') {
     transportList.push(new transports.Console());
@@ -52,7 +62,6 @@ const logger = createLogger({
         printf(({ timestamp, level, message, ...data }) => {
 
             const response = {
-
                 level,
                 timestamp,
                 message,
