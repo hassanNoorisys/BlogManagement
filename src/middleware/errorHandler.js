@@ -1,3 +1,4 @@
+import logger from '../config/logger.js';
 import responseHandler from '../utils/responseHandler.js';
 
 const errorHandler = (err, req, res, next) => {
@@ -9,6 +10,14 @@ const errorHandler = (err, req, res, next) => {
     const status = err.status || 'error';
     const message = err.message || 'Internal Server Error';
 
+    logger.error('Failed ...',
+         {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+        errorStack: err.stack
+    }
+)
     responseHandler(res, statusCode, status, message);
 };
 

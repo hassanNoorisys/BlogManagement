@@ -75,7 +75,7 @@ const createBlogService = async (data) => {
         authorModel.findOne({ _id: userId }),
     ]);
 
-    if (!admin && !author && author.isDeleted == true)
+    if (admin || (author && author.isDeleted == true))
         throw new AppError(constants.UNAUTHORIZED, 'User not registered');
 
     const user = role === 'admin' ? { admin: userId } : { author: userId };

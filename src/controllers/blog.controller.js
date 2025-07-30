@@ -14,6 +14,8 @@ import { Types } from 'mongoose';
 import responseHandler from '../utils/responseHandler.js';
 import constants from '../config/constants.js';
 import AppError from '../utils/appError.js';
+import logger from '../config/logger.js';
+import formatHTTPLog from '../config/httpLogFormatter.js';
 
 // create blog
 const createBlog = asyncHandler(async (req, res, next) => {
@@ -54,6 +56,11 @@ const createBlog = asyncHandler(async (req, res, next) => {
         role,
     });
 
+    logger.info(`Blog created by userId ${userId}`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
     responseHandler(
         res,
         constants.CREATED,
@@ -114,11 +121,11 @@ const getBlogs = asyncHandler(async (req, res, next) => {
         ...(title && { title }),
         ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
             ? {
-                  createdAt: {
-                      $gte: from,
-                      $lt: to,
-                  },
-              }
+                createdAt: {
+                    $gte: from,
+                    $lt: to,
+                },
+            }
             : {}),
     };
 
@@ -134,6 +141,7 @@ const getBlogs = asyncHandler(async (req, res, next) => {
         isUnique,
     });
 
+    logger.http('Success ...', formatHTTPLog(req, res))
     responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
 });
 
@@ -335,11 +343,11 @@ const getBlogOnState = asyncHandler(async (req, res, next) => {
         ...(title && { title }),
         ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
             ? {
-                  createdAt: {
-                      $gte: from,
-                      $lt: to,
-                  },
-              }
+                createdAt: {
+                    $gte: from,
+                    $lt: to,
+                },
+            }
             : {}),
     };
 
