@@ -1,6 +1,7 @@
+import dotenv from 'dotenv'
+dotenv.config({ path: '.env.dev' });
 import express from 'express';
 import morgan from 'morgan';
-import errorHandler from './src/middleware/errorHandler.js';
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use('/api/admin', adminRoute);
 app.use('/api/blog', blogRoute);
 
 // error handler
+import errorHandler from './src/middleware/errorHandler.js';
+
 app.use(errorHandler);
 
 export default app;

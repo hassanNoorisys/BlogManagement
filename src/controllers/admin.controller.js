@@ -11,6 +11,7 @@ import {
     updateAdminService,
 } from '../services/admin.service.js';
 import responseHandler from '../utils/responseHandler.js';
+import logger from '../config/logger.js';
 
 // register admin
 const registerAdmin = asyncHandler(async (req, res, next) => {
@@ -33,6 +34,11 @@ const registerAdmin = asyncHandler(async (req, res, next) => {
         adminAvatar,
     });
 
+    logger.info(`Admin Registered with email ${adminEmail} `, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
     responseHandler(
         res,
         constants.OK,
@@ -53,6 +59,12 @@ const loginAdmin = asyncHandler(async (req, res, next) => {
         );
 
     const token = await loginAdminService({ adminEmail, adminPassword });
+    
+    logger.info(`Admin with email ${adminEmail} logged in`, {
+        method: req.method,
+        url: req.originalUrl,
+        statusCode: res.statusCode,
+    })
 
     responseHandler(res, constants.OK, 'success', 'Login Successfull', {
         adminEmail,
