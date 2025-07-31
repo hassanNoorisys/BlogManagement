@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import responseHandler from '../utils/responseHandler.js';
 
 const verifyToken = (req, res, next) => {
+
     let token = req.headers.authorization;
 
     if (!token)

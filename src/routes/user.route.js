@@ -1,20 +1,13 @@
 import { Router } from 'express';
 import {
-    loginUser,
-    registerUser,
     requestAuthorRole,
-    verifyEmail,
 } from '../controllers/user.controller.js';
-import profileImageUpload from '../middleware/uploadUserAvatar.js';
 import verifyToken from '../middleware/verifyToken.js';
+import { registerFCMToken } from '../controllers/user.controller.js';
 
 const route = Router();
 
-// login and registration
-route
-    .post('/register', profileImageUpload.single('bio[avatar]'), registerUser)
-    .post('/verify-email', verifyEmail)
-    .post('/login', loginUser);
+route.post('/register-fcm-token', verifyToken, registerFCMToken)
 
 // request route
 route.post('/request-author-role', verifyToken, requestAuthorRole);

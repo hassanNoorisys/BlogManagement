@@ -29,6 +29,8 @@ const readerSchema = new Schema(
 
         role: String,
 
+        fcmToken: String,
+
         readerOtp: { type: Number, default: null },
 
         // verfied: { type: Boolean, default: false }

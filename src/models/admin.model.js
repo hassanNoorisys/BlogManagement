@@ -31,6 +31,8 @@ const adminSchema = new Schema(
         // verfied: { type: Boolean, default: false
 
         role: String,
+        
+        fcmToken: String
     },
     { timestamps: true }
 );

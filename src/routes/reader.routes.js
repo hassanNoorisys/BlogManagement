@@ -7,7 +7,7 @@ import {
     registerReader,
 } from '../controllers/reader.controller.js';
 import verifyRole from '../middleware/verifyRole.js';
-import rateLimit from 'express-rate-limit';
+import rateLimit from '../middleware/rateLimit.js';
 
 const route = Router();
 

@@ -1,42 +1,27 @@
 import constants from '../config/constants.js';
-import userModel from '../models/user.model.js';
 import AppError from '../utils/appError.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import sendEmail from '../utils/sendEmail.js';
-import readerModel from '../models/reader.model.js';
+import adminModel from '../models/admin.model.js'
+import readerModel from '../models/reader.model.js'
+import authorModel from '../models/author.model.js'
 
-// register user service
-// const registerUserService = async (data) => {
-//     const { name, email, password, avatar } = data;
+// register fcm token service
+const registerFCMTokenService = async ({ role, userId }, fcmToken) => {
 
-//     const existingUser = await userModel.findOne({ email });
+    let user;
+    if (role === 'Admin') {
 
-//     if (existingUser)
-//         throw new AppError(
-//             constants.CONFLICT,
-//             'User is already registered with this email'
-//         );
+        user = await adminModel.findByIdAndUpdate({ _id: userId }, { fcmToken: fcmToken })
 
-//     // send otp by email
-//     const EMAIL_USER = process.env.EMAIL_USER;
+    } else if (role === 'Autor') {
 
-//     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        user = await authorModel.findByIdAndUpdate({ _id: userId }, { fcmToken: fcmToken })
+    } else {
 
-//     await sendEmail(
-//         EMAIL_USER,
-//         email,
-//         'Email Verification',
-//         `Your OTP for blog management is ${otp}`
-//     );
+        user = await readerModel.findByIdAndUpdate({ _id: userId }, { fcmToken: fcmToken })
+    }
 
-//     // save user
-//     const newUser = new readerModel({ name, email, password, avatar });
-
-//     await newUser.save();
-
-//     return { email: newUser.email };
-// };
+    if (!user) throw new AppError(constants.NOT_FOUND, 'User is not present');
+}
 
 // verify email service
 const verifyEmailService = async (data) => {
@@ -53,31 +38,6 @@ const verifyEmailService = async (data) => {
     if (otp !== existingUser.otp)
         throw new AppError(constants.BAD_REQUEST, 'Invalid OTP');
 };
-
-// login user service
-// const loginUsersService = async (data) => {
-//     const { email, password } = data;
-
-//     const existingUser = await userModel.findOne({ email });
-
-//     if (!existingUser)
-//         throw new AppError(constants.NOT_FOUND, 'User is not present');
-
-//     const valid = await bcrypt.compare(password, existingUser.password);
-//     if (!valid)
-//         throw new AppError(constants.UNAUTHORIZED, 'Invalid Creentials');
-
-//     const SECRET_KEY = process.env.SECRET_KEY;
-//     const token = jwt.sign(
-//         { id: existingUser._id, role: existingUser.role },
-//         SECRET_KEY,
-//         {
-//             expiresIn: '10d',
-//         }
-//     );
-
-//     return token;
-// };
 
 // request author service
 const requestAuthorService = async (data) => {
@@ -103,8 +63,7 @@ const requestAuthorService = async (data) => {
 };
 
 export {
-    registerUserService,
     verifyEmailService,
-    loginUsersService,
     requestAuthorService,
+    registerFCMTokenService
 };

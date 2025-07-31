@@ -1,6 +1,6 @@
 import logger from '../config/logger.js';
 import responseHandler from '../utils/responseHandler.js';
-
+import AppError from '../utils/appError.js';
 const errorHandler = (err, req, res, next) => {
 
     console.log('stack -->', err.stack);

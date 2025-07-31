@@ -5,6 +5,7 @@ import AppError from '../utils/appError.js';
 import adminModel from '../models/admin.model.js';
 import authorModel from '../models/author.model.js';
 import readerModel from '../models/reader.model.js';
+import fcmAdmin from '../config/firebase/config.js'
 
 const getBlogPipeline = [
     {
@@ -70,11 +71,13 @@ const getBlogPipeline = [
 const createBlogService = async (data) => {
     const { title, content, images, userId, role, slug } = data;
 
-    const [admin, author] = await Promise.all([
+    const [admin, author, readers] = await Promise.all([
         adminModel.findOne({ _id: userId }),
         authorModel.findOne({ _id: userId }),
+        readerModel.find()
     ]);
 
+    // console.log('create blog service --> ', author)
     if (admin || (author && author.isDeleted == true))
         throw new AppError(constants.UNAUTHORIZED, 'User not registered');
 
@@ -82,6 +85,23 @@ const createBlogService = async (data) => {
 
     const newBlog = new blogModel({ title, content, images, slug, ...user });
     await newBlog.save();
+
+    const registrationTokens = []
+    for (const reader of readers) {
+        if (reader.fcmToken) registrationTokens.push(reader.fcmToken)
+    }
+
+    if (registrationTokens.length < 1) return
+
+    const message = {
+        tokens: registrationTokens,
+        notification: {
+            title: 'Blog Update',
+            body: `New blog is created by ${role === 'Admin' ? admin.adminName : author.authorName} `
+        },
+    }
+
+    await fcmAdmin.messaging().sendMulticast(message)
 
     return title;
 };
@@ -103,15 +123,15 @@ const getBlogService = async ({
 
         ...(blogOwnerName
             ? [
-                  {
-                      $match: {
-                          'user.name': {
-                              $regex: blogOwnerName,
-                              $options: 'i',
-                          },
-                      },
-                  },
-              ]
+                {
+                    $match: {
+                        'user.name': {
+                            $regex: blogOwnerName,
+                            $options: 'i',
+                        },
+                    },
+                },
+            ]
             : []),
         {
             $project: {
@@ -338,11 +358,11 @@ const getFavouriteBlogsService = async (query, userId) => {
         ...(title && { title }),
         ...(fromYear || toYear || fromMonth || toMonth || fromDay || toDay
             ? {
-                  createdAt: {
-                      $gte: from,
-                      $lt: to,
-                  },
-              }
+                createdAt: {
+                    $gte: from,
+                    $lt: to,
+                },
+            }
             : {}),
     };
 
@@ -356,15 +376,15 @@ const getFavouriteBlogsService = async (query, userId) => {
 
         ...(blogOwnerName
             ? [
-                  {
-                      $match: {
-                          'user.name': {
-                              $regex: blogOwnerName,
-                              $options: 'i',
-                          },
-                      },
-                  },
-              ]
+                {
+                    $match: {
+                        'user.name': {
+                            $regex: blogOwnerName,
+                            $options: 'i',
+                        },
+                    },
+                },
+            ]
             : []),
         {
             $project: {
@@ -427,15 +447,15 @@ const getBlogOnStateService = async ({
 
         ...(blogOwnerName
             ? [
-                  {
-                      $match: {
-                          'user.name': {
-                              $regex: blogOwnerName,
-                              $options: 'i',
-                          },
-                      },
-                  },
-              ]
+                {
+                    $match: {
+                        'user.name': {
+                            $regex: blogOwnerName,
+                            $options: 'i',
+                        },
+                    },
+                },
+            ]
             : []),
         {
             $project: {

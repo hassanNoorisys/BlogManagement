@@ -22,7 +22,7 @@ route
         profileImageUpload.single('avatar'),
         registerAuthor
     )
-    .post('/login', loginAuthor);
+    .post('/login', loginAuthor)
 // .post('/verify-email', verifyEmail)
 
 // request route

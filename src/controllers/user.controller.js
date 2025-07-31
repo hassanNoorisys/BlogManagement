@@ -2,35 +2,25 @@ import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
 import constants from '../config/constants.js';
 import {
-    loginUsersService,
-    registerUserService,
+    registerFCMTokenService,
     requestAuthorService,
     verifyEmailService,
 } from '../services/user.service.js';
 import responseHandler from '../utils/responseHandler.js';
 
-// registe user
-const registerUser = asyncHandler(async (req, res, next) => {
-    const { name, email, password } = req.body;
+// register fcm token 
+const registerFCMToken = asyncHandler(async (req, res, next) => {
 
-    if (!name || !email || !password)
-        return next(
-            new AppError(constants.BAD_REQUEST, 'All fields are required !!')
-        );
+    const role = req.user.role
+    const userId = req.user.id
 
-    // handle image url
-    const avatar = req.file.filename;
+    const fcmToken = req.body.fcmToken
 
-    const data = await registerUserService({ name, email, password, avatar });
+    await registerFCMTokenService({ role, userId }, fcmToken)
 
-    responseHandler(
-        res,
-        constants.OK,
-        'success',
-        'OTP is sent to your email',
-        data
-    );
-});
+    responseHandler(res, constants.OK, 'success', 'FCM token registered')
+
+})
 
 // verify email
 const verifyEmail = asyncHandler(async (req, res, next) => {
@@ -51,24 +41,6 @@ const verifyEmail = asyncHandler(async (req, res, next) => {
     );
 });
 
-// login user
-const loginUser = asyncHandler(async (req, res, next) => {
-    const { email, password } = req.body;
-
-    console.log('login --> ', email, password);
-    if (!email || !password)
-        return next(
-            new AppError(constants.BAD_REQUEST, 'All fields are required !!')
-        );
-
-    const token = await loginUsersService({ email, password });
-
-    responseHandler(res, constants.OK, 'success', 'Login Successfull', {
-        email,
-        token,
-    });
-});
-
 // request author role
 const requestAuthorRole = asyncHandler(async (req, res, next) => {
     const { email } = req.body;
@@ -83,4 +55,4 @@ const requestAuthorRole = asyncHandler(async (req, res, next) => {
     responseHandler(res, constants.OK, 'success', 'Request has been sent');
 });
 
-export { registerUser, verifyEmail, loginUser, requestAuthorRole };
+export { verifyEmail, requestAuthorRole, registerFCMToken };
