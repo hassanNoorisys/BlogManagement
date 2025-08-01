@@ -1,5 +1,3 @@
-import dotenv from 'dotenv'
-dotenv.config({ path: '.env.dev' });
 import express from 'express';
 import morgan from 'morgan';
 

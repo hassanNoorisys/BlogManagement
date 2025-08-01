@@ -85,7 +85,7 @@ const createBlogService = async (data) => {
     const newBlog = new blogModel({ title, content, images, slug, ...user });
     await newBlog.save();
 
-    return { newTitle: title, topics:readerTopics, name: role === 'Admin' ? admin.adminName : author.authorName };
+    return { newTitle: title, topics:readerTopics, name: (role === 'Admin' ? admin.adminName : author.authorName) };
 };
 
 // get blog service

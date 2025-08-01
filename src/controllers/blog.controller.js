@@ -58,14 +58,13 @@ const createBlog = asyncHandler(async (req, res, next) => {
         topics.forEach(async topic => {
 
             const message = {
-                topic:  topic.subscribedTo.toString(),
+                topic: topic.subscribedTo.toString(),
                 notification: {
                     title: 'Blog Update',
                     body: `New blog is created by ${name} `
                 },
             }
 
-            console.log('create blog -->  ', message)
             await messaging.send(message)
         });
 
@@ -80,10 +79,14 @@ const createBlog = asyncHandler(async (req, res, next) => {
 // get blogs
 const getBlogs = asyncHandler(async (req, res, next) => {
     const query = req.query;
-    if (!query)
-        return next(
-            new AppError(constants.BAD_REQUEST, 'All fields are required !!')
-        );
+
+    // if (!query) {
+
+    //     console.log('get blogs --> ', query)
+    //     return next(
+    //         new AppError(constants.BAD_REQUEST, 'All fields are required !!')
+    //     );
+    // }
 
     const {
         title,
@@ -148,7 +151,7 @@ const getBlogs = asyncHandler(async (req, res, next) => {
         isUnique,
     });
 
-    responseHandler(res, constants.OK, 'success', 'Blogs found', blogs);
+    responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
 
     logger.info(`Get list of blogs using ${JSON.stringify({ blogs })}`, {
         method: req.method,
