@@ -43,7 +43,14 @@ const authorSchema = new Schema(
         authorOtp: { type: Number, default: null },
         // verfied: { type: Boolean, default: false
 
-        fcmToken: String
+        fcmToken: String,
+
+        subscribbers: [
+            {
+                type: Types.ObjectId,
+                ref: 'reader'
+            }
+        ],
     },
 
     { timestamps: true }

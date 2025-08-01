@@ -16,6 +16,7 @@ import constants from '../config/constants.js';
 import AppError from '../utils/appError.js';
 import logger from '../config/logger.js';
 import formatHTTPLog from '../config/httpLogFormatter.js';
+import messaging from '../config/firebase/config.js'
 
 // create blog
 const createBlog = asyncHandler(async (req, res, next) => {
@@ -47,28 +48,33 @@ const createBlog = asyncHandler(async (req, res, next) => {
         '-' +
         Date.now();
 
-    const newBlogTitle = await createBlogService({
-        title,
-        content,
-        slug,
-        images,
-        userId,
-        role,
-    });
+    const { newTitle, topics, name } = await createBlogService({ title, content, slug, images, userId, role, });
 
-    responseHandler(
-        res,
-        constants.CREATED,
-        'success',
-        `New Blog created for ${newBlogTitle}`,
-        { newBlogTitle }
-    );
+    responseHandler(res, constants.CREATED, 'success', `New Blog created for ${newTitle}`, newTitle);
 
-    logger.info(`Blog created by userId ${userId}`, {
-        method: req.method,
-        url: req.originalUrl,
-        statusCode: res.statusCode,
-    })
+    // send push notification to the subscribers
+    if (topics.length >= 1) {
+
+        topics.forEach(async topic => {
+
+            const message = {
+                topic:  topic.subscribedTo.toString(),
+                notification: {
+                    title: 'Blog Update',
+                    body: `New blog is created by ${name} `
+                },
+            }
+
+            console.log('create blog -->  ', message)
+            await messaging.send(message)
+        });
+
+        logger.info(`Blog created by userId ${userId}`, {
+            method: req.method,
+            url: req.originalUrl,
+            statusCode: res.statusCode,
+        })
+    }
 });
 
 // get blogs
@@ -408,7 +414,7 @@ const getBlogOnState = asyncHandler(async (req, res, next) => {
     });
 
     responseHandler(res, constants.OK, 'success', 'Blogs found', { blogs });
-    
+
     logger.info(`Get list of active or inactive blog using filter: ${filter}`, {
         method: req.method,
         url: req.originalUrl,

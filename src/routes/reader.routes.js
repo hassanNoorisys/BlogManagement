@@ -5,6 +5,7 @@ import {
     deleteReader,
     loginReader,
     registerReader,
+    subscribeAuthor,
 } from '../controllers/reader.controller.js';
 import verifyRole from '../middleware/verifyRole.js';
 import rateLimit from '../middleware/rateLimit.js';
@@ -19,7 +20,8 @@ route
         profileImageUpload.single('avatar'),
         registerReader
     )
-    .post('/login', rateLimit, loginReader);
+    .post('/login', rateLimit, loginReader)
+    .post('/subscribe/:id', verifyToken, subscribeAuthor)    // subscribe a author
 // .post('/verify-email', verifyEmail)
 
 // request route

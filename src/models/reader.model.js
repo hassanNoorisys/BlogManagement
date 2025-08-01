@@ -1,6 +1,5 @@
 import { model, Schema, Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
-import { ref } from 'process';
 
 const readerSchema = new Schema(
     {
@@ -30,6 +29,13 @@ const readerSchema = new Schema(
         role: String,
 
         fcmToken: String,
+
+        subscribedTo: [
+            {
+                type: Types.ObjectId,
+                ref: 'author'
+            }
+        ],
 
         readerOtp: { type: Number, default: null },
 

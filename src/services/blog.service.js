@@ -5,7 +5,6 @@ import AppError from '../utils/appError.js';
 import adminModel from '../models/admin.model.js';
 import authorModel from '../models/author.model.js';
 import readerModel from '../models/reader.model.js';
-import fcmAdmin from '../config/firebase/config.js'
 
 const getBlogPipeline = [
     {
@@ -71,10 +70,10 @@ const getBlogPipeline = [
 const createBlogService = async (data) => {
     const { title, content, images, userId, role, slug } = data;
 
-    const [admin, author, readers] = await Promise.all([
+    const [admin, author, readerTopics] = await Promise.all([
         adminModel.findOne({ _id: userId }),
         authorModel.findOne({ _id: userId }),
-        readerModel.find()
+        readerModel.find({ subscribedTo: userId }).select('subscribedTo')
     ]);
 
     // console.log('create blog service --> ', author)
@@ -86,24 +85,7 @@ const createBlogService = async (data) => {
     const newBlog = new blogModel({ title, content, images, slug, ...user });
     await newBlog.save();
 
-    const registrationTokens = []
-    for (const reader of readers) {
-        if (reader.fcmToken) registrationTokens.push(reader.fcmToken)
-    }
-
-    if (registrationTokens.length < 1) return
-
-    const message = {
-        tokens: registrationTokens,
-        notification: {
-            title: 'Blog Update',
-            body: `New blog is created by ${role === 'Admin' ? admin.adminName : author.authorName} `
-        },
-    }
-
-    await fcmAdmin.messaging().sendMulticast(message)
-
-    return title;
+    return { newTitle: title, topics:readerTopics, name: role === 'Admin' ? admin.adminName : author.authorName };
 };
 
 // get blog service

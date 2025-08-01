@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import readerModel from '../models/reader.model.js';
 import constants from '../config/constants.js';
 import { sendOTPEmail } from '../utils/sendEmail.js';
+import authorModel from '../models/author.model.js';
+import messaging from '../config/firebase/config.js'
 
 // register reader service
 const registerReaderService = async (data) => {
@@ -86,4 +88,18 @@ const deleteReaderService = async (filter) => {
     return { email: readerEmail, name: readerName };
 };
 
-export { registerReaderService, loginReaderService, deleteReaderService };
+// subscribe author service
+const subscribeAuthorService = async (authorId, userId) => {
+
+    const [author, reader] = await Promise.all([
+
+        authorModel.findByIdAndUpdate({ _id: authorId }, { $addToSet: { subscribbers: userId }, }, { new: true }),
+        readerModel.findByIdAndUpdate({ _id: userId }, { $addToSet: { subscribedTo: authorId }, }, { new: true })
+    ])
+
+    if (!author || !reader) throw new AppError(constants.NOT_FOUND, 'User or Author not found')
+
+    await messaging.subscribeToTopic(reader.fcmToken, authorId.toString())
+}
+
+export { registerReaderService, loginReaderService, deleteReaderService, subscribeAuthorService };

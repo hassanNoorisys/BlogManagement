@@ -2,6 +2,7 @@ import {
     deleteReaderService,
     loginReaderService,
     registerReaderService,
+    subscribeAuthorService,
 } from '../services/reader.service.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import AppError from '../utils/appError.js';
@@ -78,4 +79,17 @@ const deleteReader = asyncHandler(async (req, res, next) => {
     });
 });
 
-export { registerReader, loginReader, deleteReader };
+// subscribe author 
+const subscribeAuthor = asyncHandler(async (req, res, next) => {
+
+    const authorId = req.params.id
+    const userId = req.user.id
+
+    if (!authorId) return next(new AppError(constants.BAD_REQUEST, 'All fields are required !!'));
+
+    await subscribeAuthorService(authorId, userId)
+
+    responseHandler(res, constants.OK, 'success', 'Subscribed')
+})
+
+export { registerReader, loginReader, deleteReader, subscribeAuthor };
