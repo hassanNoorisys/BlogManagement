@@ -30,7 +30,7 @@ describe('registerReaderService', () => {
   });
 
   it('Should throw an error if user already exists', async () => {
-    mockReaderModel.findOne.mockResolvedValue({}); // simulate user exists
+    mockReaderModel.findOne.mockResolvedValue({}); 
 
     await expect(registerReaderService(mockData)).rejects.toThrow(
       'User is already registered with this email'
