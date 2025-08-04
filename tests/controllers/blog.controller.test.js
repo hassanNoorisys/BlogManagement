@@ -16,8 +16,6 @@ describe('GET /api/blog', () => {
 
         const res = await request(app).get('/api/blog/').query({ page: 1, size: 5 })
 
-        // console.log('blog test --> ', typeof res.body.data.blogs, res.body.data)
-
         expect(res.statusCode).toBe(200)
         expect(Array.isArray(res.body.data.blogs)).toBe(true)
         

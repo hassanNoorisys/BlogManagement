@@ -9,6 +9,7 @@ import messaging from '../config/firebase/config.js'
 
 // register reader service
 const registerReaderService = async (data) => {
+    
     const { readerEmail, readerPassword, readerName, readerAvatar } = data;
 
     const existingUser = await readerModel.findOne({ readerEmail });
