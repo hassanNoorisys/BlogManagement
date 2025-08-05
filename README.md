@@ -10,7 +10,7 @@ This API implements 3 levels of user access:
 
 | Role   | Permissions |
 |--------|-------------|
-| **Admin** | ✅ Create/Delete Authors<br>✅ Create/Delete Blogs |
+| **Admin** | ✅ Create/Delete Authors<br>✅ Create/Delete Blogs, Readers, Mark Active or inactive Blogs and Authors |
 | **Author** | ✅ Create Blogs<br>✅ Delete Own Blogs |
 | **Reader** | ✅ Read Blogs<br>✅ Like/Dislike Blogs<br>✅ Add Blogs to Favourites<br>✅ Subscribe to Authors |
 
@@ -36,6 +36,20 @@ This API implements 3 levels of user access:
 ### 1️⃣ Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/blog-management-api.git
-cd blog-management-api
+git clone https://github.com/hassanNoorisys/BlogManagement.git
+cd BlogManagement
+```
+
+### Install dependencies
+```bash
+npm install
+```
+
+### setup environment varibles and Firebase FCM
+- Copy the environment variables from .env.example to .env.dev
+- Get the token from FCM and ServiceAccount key from firebase console
+
+### Run the local development server
+```bash
+npm run dev
 ```
