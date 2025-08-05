@@ -1,5 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
+import YAML from 'yamljs';
+import swaggerUI from 'swagger-ui-express'
 
 const app = express();
 
@@ -20,6 +22,11 @@ app.use('/api/author', authorRoute);
 app.use('/api/admin', adminRoute);
 app.use('/api/blog', blogRoute);
 app.use('/api/user', userRoute);
+
+// docs
+const swaggerDocs = YAML.load('./docs/swagger.yaml')
+app.use('/api/docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs))
+
 
 // error handler
 import errorHandler from './src/middleware/errorHandler.js';

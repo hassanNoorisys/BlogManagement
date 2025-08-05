@@ -1,0 +1,550 @@
+openapi: 3.0.3
+info:
+  title: Blog Management API
+  version: 1.0.0
+  description: API documentation Blog Management API
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Admin
+    description: Admin related endpoints
+  - name: Author
+    description: Author related endpoints
+  - name: Reader
+    description: Reader Related endpoints
+  - name: Blog
+    description: Blog related endpoints
+
+paths:
+  /api/admin/register:
+    post:
+      tags:
+        - Admin
+      summary: Register a new admin
+      description: Register a new admin with email, password, name, and avatar image
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - adminEmail
+                - adminPassword
+                - adminName
+                - avatar
+              properties:
+                adminEmail:
+                  type: string
+                  format: email
+                  example: admin@example.com
+                adminPassword:
+                  type: string
+                  format: password
+                  example: StrongPassword123
+                adminName:
+                  type: string
+                  example: John Admin
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: OTP sent to admin's email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationSuccessResponse'
+        '400':
+          description: Bad Request - Missing fields
+        '409':
+          description: Conflict - Email already registered
+        '500':
+          description: Internal Server Error
+
+  /api/admin/login:
+    post:
+      tags:
+        - Admin
+      summary: Admin login
+      description: Logs in an admin and returns a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessResponse'
+        '400':
+          description: Bad Request - Missing fields
+        '401':
+          description: Unauthorized - Invalid credentials
+        '500':
+          description: Internal Server Error
+
+  /api/author/register:
+    post:
+      tags:
+        - Author
+      summary: Register a new author
+      description: Register a new author (only accessible by Admins, requires Bearer token)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - authorEmail
+                - authorPassword
+                - authorName
+                - avatar
+              properties:
+                authorEmail:
+                  type: string
+                  format: email
+                  example: author@example.com
+                authorPassword:
+                  type: string
+                  format: password
+                  example: SecurePass123
+                authorName:
+                  type: string
+                  example: Alice Writer
+                avatar:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Author registered successfully and OTP sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationSuccessResponse'
+        '400':
+          description: Bad Request - Missing fields
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '403':
+          description: Forbidden - Only admins can register authors
+        '409':
+          description: Conflict - Email already registered
+        '500':
+          description: Internal Server Error
+
+  /api/author/login:
+    post:
+      tags:
+        - Author
+      summary: Author login
+      description: Logs in an author and returns a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorLoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessResponse'
+        '400':
+          description: Bad Request - Missing fields
+        '401':
+          description: Unauthorized - Invalid credentials
+        '404':
+          description: Not Found - User does not exist
+        '500':
+          description: Internal Server Error
+
+  /api/reader/register:
+    post:
+      tags:
+        - Reader
+      summary: Register a new reader
+      description: Register a reader with email, password, name and avatar image. Sends OTP email after registration.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - readerEmail
+                - readerPassword
+                - readerName
+                - avatar
+              properties:
+                readerEmail:
+                  type: string
+                  format: email
+                  example: reader@example.com
+                readerPassword:
+                  type: string
+                  format: password
+                  example: strongpassword123
+                readerName:
+                  type: string
+                  example: John Doe
+                avatar:
+                  type: string
+                  format: binary
+                  description: Reader's profile image
+      responses:
+        '200':
+          description: OTP sent to admin's email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationSuccessResponse'
+
+        '400':
+          description: Bad Request - Missing required fields
+        '409':
+          description: Conflict - User already registered with this email
+        '500':
+          description: Internal Server Error
+
+  /api/reader/login:
+    post:
+      tags:
+        - Reader
+      summary: Login reader
+      description: Login a reader using email and password to receive an authentication token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthorLoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessResponse'
+
+        '400':
+          description: Bad Request - Missing required fields
+        '404':
+          description: Not Found - User is not present
+        '401':
+          description: Unauthorized - Invalid credentials
+        '500':
+          description: Internal Server Error
+  
+  /api/blog/create:
+    post:
+      tags:
+        - Blog
+      summary: Create a new blog post
+      description: >
+        Create a blog post with title, content, and multiple images.
+        Requires authentication with roles Admin or Author.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+                - images
+              properties:
+                title:
+                  type: string
+                  example: "My First Blog Post"
+                content:
+                  type: string
+                  example: "This is the content of the blog post."
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: "Array of image files"
+      responses:
+        '201':
+          description: Blog created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: New Blog created for My First Blog Post
+                  data:
+                    type: string
+                    example: My First Blog Post
+        '400':
+          description: Bad Request - Missing required fields
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '403':
+          description: Forbidden - Insufficient role
+        '500':
+          description: Internal Server Error
+
+  /api/blog/:
+    get:
+      tags:
+        - Blog
+      summary: Get list of blogs with filters and pagination
+      description: Retrieve blogs filtered by various query parameters including title, slug, owner, date range, with pagination support.
+      parameters:
+        - in: query
+          name: title
+          schema:
+            type: string
+          description: Filter blogs by exact title
+        - in: query
+          name: slug
+          schema:
+            type: string
+          description: Filter blogs by slug
+        - in: query
+          name: blogOwnerName
+          schema:
+            type: string
+          description: Filter blogs by owner name (partial match, case-insensitive)
+        - in: query
+          name: id
+          schema:
+            type: string
+          description: Filter by blog ID
+        - in: query
+          name: fromYear
+          schema:
+            type: integer
+            example: 2023
+          description: Filter blogs created from this year (inclusive)
+        - in: query
+          name: fromMonth
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 1
+          description: Filter blogs created from this month (inclusive)
+        - in: query
+          name: fromDay
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 31
+            example: 1
+          description: Filter blogs created from this day (inclusive)
+        - in: query
+          name: toYear
+          schema:
+            type: integer
+            example: 2023
+          description: Filter blogs created up to this year (inclusive)
+        - in: query
+          name: toMonth
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+            example: 12
+          description: Filter blogs created up to this month (inclusive)
+        - in: query
+          name: toDay
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 31
+            example: 31
+          description: Filter blogs created up to this day (inclusive)
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: size
+          schema:
+            type: integer
+            minimum: 1
+            default: 5
+          description: Number of blogs per page
+      responses:
+        '200':
+          description: List of blogs found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Blogs found
+                  data:
+                    type: object
+                    properties:
+                      blogs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                              example: My First Blog Post
+                            slug:
+                              type: string
+                              example: my-first-blog-post-1690000000000
+                            content:
+                              type: string
+                              example: This is the content of the blog.
+                            createdAt:
+                              type: string
+                              format: date-time
+                              example: '2023-07-15T08:55:00Z'
+                            isActive:
+                              type: boolean
+                              example: true
+                            user:
+                              type: object
+                              properties:
+                                _id:
+                                  type: string
+                                  example: 64a3b8f8d9a1c9f71bc12345
+                                name:
+                                  type: string
+                                  example: Alice Writer
+                                email:
+                                  type: string
+                                  format: email
+                                  example: alice@example.com
+                                avatar:
+                                  type: string
+                                  example: avatar123.jpg
+                                bio:
+                                  type: string
+                                  example: A passionate author
+                                role:
+                                  type: string
+                                  example: Author
+        '400':
+          description: Bad Request - Invalid query parameters
+        '404':
+          description: Blog not found
+        '500':
+          description: Internal Server Error
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegistrationSuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: OTP is sent to your email
+        data:
+          type: object
+          properties:
+            email:
+              type: string
+              example: user@example.com
+
+    AdminLoginRequest:
+      type: object
+      required:
+        - adminEmail
+        - adminPassword
+      properties:
+        adminEmail:
+          type: string
+          format: email
+          example: admin@example.com
+        adminPassword:
+          type: string
+          format: password
+          example: StrongPassword123
+
+    LoginSuccessResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        message:
+          type: string
+          example: Login Successfull
+        data:
+          type: object
+          properties:
+            adminEmail:
+              type: string
+              example: admin@example.com
+            token:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+    AuthorLoginRequest:
+      type: object
+      required:
+        - authorEmail
+        - authorPassword
+      properties:
+        authorEmail:
+          type: string
+          format: email
+          example: author@example.com
+        authorPassword:
+          type: string
+          format: password
+          example: SecurePass123
+
+    ReaderLoginRequest:
+      type: object
+      required:
+        - readerEmail
+        - readerPassword
+      properties:
+        readerEmail:
+          type: string
+          format: email
+          example: author@example.com
+        readerPassword:
+          type: string
+          format: password
+          example: SecurePass123
+
