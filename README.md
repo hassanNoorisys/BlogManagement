@@ -48,6 +48,7 @@ npm install
 ### setup environment varibles and Firebase FCM
 - Copy the environment variables from .env.example to .env.dev
 - Get the token from FCM and ServiceAccount key from firebase console
+- Get App password of yout Gmail to setup the mail sending using nodemailer
 
 ### Run the local development server
 ```bash
