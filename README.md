@@ -1,7 +1,6 @@
 # 📝 Blog Management API
 
-A robust and role-based Blog Management API built with **Node.js**, designed to handle content creation, interaction, and user access control.
-
+The Blog Management API is a scalable and secure RESTful API designed to manage a blogging platform with multiple levels of user access. Built with Node.js, Express, and MongoDB, it provides a clear separation of privileges across three user roles: Admin, Author, and Reader. Admins can manage the entire platform by creating or deleting authors and blogs. Authors can write, publish, and manage their own blogs. Readers can explore blog content, like or dislike posts, add blogs to their favourites, and subscribe to authors to receive notifications. The API is documented with Swagger, tested using Jest, and integrates Firebase Cloud Messaging (FCM) to send real-time push notifications for activities like new blog posts, likes, and subscriptions. This API is ideal for building full-featured blogging platforms, content-sharing portals, or educational writing systems with fine-grained access control.
 ---
 
 ## 🔐 Access Levels
@@ -53,4 +52,16 @@ npm install
 ### Run the local development server
 ```bash
 npm run dev
+```
+
+📄 API Documentation
+Interactive Swagger documentation is available at:
+```bash
+http://localhost:3000/api/docs
+```
+
+✅ Testing
+Tests are written using Jest and include unit and integration coverage.
+```bash
+npm run test
 ```
