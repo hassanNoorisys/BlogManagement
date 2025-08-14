@@ -74,5 +74,4 @@ npm run test
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?logo=linkedin&style=flat-square&logoColor=white)](https://linkedin.com/in/your-linkedin)  
 [![Portfolio](https://img.shields.io/badge/Portfolio-121212?logo=vercel&style=flat-square&logoColor=white)](https://yourportfolio.com)
 
-> Passionate about building clean, scalable APIs and real-time systems.
 
